@@ -92,7 +92,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ message: "OTP göndərildi. Aktivlik müddəti 5 dəqiqədir" });
 
     } catch (error: any) {
-        if (error.name === 'ValidationError') {
+        if (error) {
             const errors = Object.values(error.errors).map((el: any) => el.message);
             return NextResponse.json({ error: errors.join(', ') }, { status: 400 });
         }

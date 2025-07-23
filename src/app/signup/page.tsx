@@ -20,7 +20,6 @@ const SignUpPage = () => {
     const [buttonDisabledOtp, setButtonDisabledOtp] = useState<boolean>(false)
     const [loading, setLoading] = useState<boolean>(false)
 
-    // const intervalRef = useRef<Htm>()
     const [resendTime, setResendTime] = useState<number>(30)
     const [otpActivityTime, setOtpActivityTime] = useState<number>(5 * 60)
 
@@ -122,7 +121,7 @@ const SignUpPage = () => {
             console.log(responseOtp);
             toast.success(responseOtp.data.message)
         } catch (error: any) {
-            console.log('Signup failed: ', error);
+            console.log('Resend failed: ', error);
             toast.error(error.response.data.message || error.response.data.error)
         }
     }
