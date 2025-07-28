@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import bcryptjs from 'bcryptjs';
 import User from "@/models/userModel";
 import { connect } from "@/dbConfig/dbConfig";
+import Favorites from "@/models/favoritesModel";
 
 connect()
 
@@ -24,6 +25,7 @@ export async function POST(request: NextRequest) {
         }
 
         cache.delete(email);
+
         // hash password if the user follows all the rules
         const salt = await bcryptjs.genSalt(10)
         const hashedPassword = await bcryptjs.hash(password, salt)
@@ -36,6 +38,15 @@ export async function POST(request: NextRequest) {
 
         // user saved after password hashed
         const savedUser = await newUser.save()
+
+        // create favorite
+        const newFavorites = new Favorites({
+            userId: savedUser._id,
+        })
+
+        const savedFavorites = await newFavorites.save()
+
+        await User.updateOne({ _id: savedUser._id }, { favoritesId: savedFavorites._id });
 
         return NextResponse.json({
             message: 'OTP verified! User created successfully!',

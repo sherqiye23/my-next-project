@@ -3,6 +3,7 @@ import { useMyContext } from "@/context/UserEmailContext";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
+import { CldImage, CldUploadButton } from 'next-cloudinary';
 
 export default function Home() {
   const { userInfo, setUserInfo, isLoading } = useMyContext()
@@ -40,6 +41,21 @@ export default function Home() {
             )
           )
         }
+        <div>
+
+          <CldUploadButton
+            uploadPreset="preset_name"
+            onSuccess={(result: any) => {
+              console.log("Success ilə:", result);
+              console.log('Backende post atacagin: ', result.info.path);
+            }}
+          >
+            <button className="bg-blue-500 text-white px-4 py-2 rounded">
+              Şəkil Yüklə
+            </button>
+          </CldUploadButton>
+
+        </div>
       </div>
     </>
   );
