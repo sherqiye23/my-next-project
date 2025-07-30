@@ -1,5 +1,5 @@
-
 export type UserRegister = {
+    id: string;
     email: string;
     password: string;
     username: string;

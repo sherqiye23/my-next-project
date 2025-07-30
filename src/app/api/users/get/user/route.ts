@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
 
         // success and response userinfo
         return NextResponse.json({
-            userId: user._id,
+            id: user._id,
             username: user.username,
             email: user.email,
             isAdmin: user.isAdmin

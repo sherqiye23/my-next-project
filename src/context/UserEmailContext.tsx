@@ -18,7 +18,7 @@ const UserEmailContext = ({ children }: any) => {
                 if (error.response.status == 401) {
                     try {
                         const response = await axios.post('/api/users/post/refresh-token', {}, { withCredentials: true });
-                        console.log(response);
+                        // console.log(response);
                         
                         const res2 = await axios.get('/api/users/get/user', { withCredentials: true });
                         setUserInfo(res2.data);

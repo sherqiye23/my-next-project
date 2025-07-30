@@ -1,6 +1,12 @@
 import jwt from "jsonwebtoken";
 import { NextRequest, NextResponse } from "next/server";
 
+interface RefreshToken {
+    userId: string;
+    username: string;
+    isAdmin: boolean;
+}
+
 export async function POST(request: NextRequest) {
     try {
         const refreshToken = request.cookies.get('refreshToken')?.value;
@@ -9,9 +15,13 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: "No Token" }, { status: 401 });
         }
 
-        const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET!) as { userId: string };
-
-        const newAccessToken = jwt.sign({ userId: decoded.userId }, process.env.JWT_SECRET!, {
+        const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET!) as RefreshToken;
+        const payload = {
+            userId: decoded.userId,
+            isAdmin: decoded.isAdmin,
+            username: decoded.username
+        };
+        const newAccessToken = jwt.sign(payload, process.env.JWT_SECRET!, {
             expiresIn: "15m",
         });
 

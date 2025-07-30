@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
 
         if (!isPasswordCorrect) {
             return NextResponse.json(
-                { message: 'Parolun sehvdi' },
+                { message: 'Password is wrong' },
                 { status: 401 },
             );
         }
@@ -38,12 +38,9 @@ export async function POST(request: NextRequest) {
             isAdmin: user.isAdmin,
             username: user.username
         };
-        const refreshPayload = {
-            userId: user._id
-        };
         try {
             const accessToken = jwt.sign(payload, process.env.JWT_SECRET!, { expiresIn: '15m' });
-            const refreshToken = jwt.sign(refreshPayload, process.env.JWT_REFRESH_SECRET!, { expiresIn: "7d" });
+            const refreshToken = jwt.sign(payload, process.env.JWT_REFRESH_SECRET!, { expiresIn: "7d" });
             const response = NextResponse.json({
                 accessToken,
                 success: true,

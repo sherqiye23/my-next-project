@@ -19,6 +19,8 @@ export default function Home() {
       toast.error('Failed logout')
     }
   }
+  console.log(userInfo);
+
 
   return (
     <>
@@ -56,6 +58,14 @@ export default function Home() {
           </CldUploadButton>
 
         </div>
+
+        <button className="bg-red-400" onClick={async () => {
+          const id = '687e4fd65447202cdb4b6fee'
+          const role = 'true'
+          const response = await axios.put(`/api/users/put/updaterole?userId=${id}&role=${role}`, null, { withCredentials: true })
+          console.log(response);
+
+        }}>change role</button>
       </div>
     </>
   );
