@@ -60,12 +60,14 @@ export default function Home() {
         </div>
 
         <button className="bg-red-400" onClick={async () => {
-          const id = '687e4fd65447202cdb4b6fee'
-          const role = 'true'
-          const response = await axios.put(`/api/users/put/updaterole?userId=${id}&role=${role}`, null, { withCredentials: true })
+          const id = userInfo?.id
+          const oldPassword = 'User123!'
+          const newPassword = 'User123!'
+          const confirmPassword = 'User123!'
+          const response = await axios.put(`/api/users/put/updatepassword?userId=${id}&oldPassword=${oldPassword}&newPassword=${newPassword}&confirmPassword=${confirmPassword}`, null, { withCredentials: true })
           console.log(response);
 
-        }}>change role</button>
+        }}>change password</button>
       </div>
     </>
   );

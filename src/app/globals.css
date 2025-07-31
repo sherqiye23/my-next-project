@@ -2,8 +2,21 @@
 @plugin "daisyui";
 
 
-body {
+/* body {
     background-color: rgb(48, 70, 83);
+} */
+
+/* body {
+    background-color: #F3F5F7;
+    background-size: 40px 40px;
+    background-image: radial-gradient(circle, #000000 1px, rgba(0, 0, 0, 0) 1px);
+} */
+
+body {
+  background-size: 70px 70px;
+  background-image:
+    linear-gradient(to right, #e1e1e1 1px, transparent 1px),
+    linear-gradient(to bottom, #e1e1e1 1px, transparent 1px);
 }
 
 /* Chrome, Safari, Edge, Opera */
