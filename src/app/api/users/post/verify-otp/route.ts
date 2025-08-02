@@ -4,7 +4,7 @@ import bcryptjs from 'bcryptjs';
 import User from "@/models/userModel";
 import { connect } from "@/dbConfig/dbConfig";
 import Favorites from "@/models/favoritesModel";
-import { Error as MongooseError } from 'mongoose';
+import mongoose from 'mongoose';
 import cloudinary from "@/lib/cloudinary";
 
 connect()
@@ -101,13 +101,18 @@ export async function POST(request: NextRequest) {
         })
 
     } catch (error: unknown) {
-        if (error instanceof MongooseError.ValidationError) {
-            const errors = Object.values(error.errors).map((el: any) => el.message);
+        if (error instanceof mongoose.Error.ValidationError) {
+            const errors = Object.values(error.errors).map(el => {
+                if (el instanceof mongoose.Error.ValidatorError) {
+                    return el.message;
+                }
+                return 'Validation error';
+            });
             return NextResponse.json({ error: errors.join(', ') }, { status: 400 });
-        }
-        if (error instanceof Error) {
+        } else if (error instanceof Error) {
             return NextResponse.json({ error: error.message }, { status: 500 });
+        } else {
+            return NextResponse.json({ error: 'Unknown error' }, { status: 500 });
         }
-        return NextResponse.json({ error: 'Unknown error' }, { status: 500 });
     }
 }
