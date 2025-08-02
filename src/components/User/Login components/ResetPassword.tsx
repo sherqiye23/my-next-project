@@ -11,6 +11,7 @@ type Props = {
 };
 
 export default function ResetPassword({ email, setPage }: Props) {
+    const [loading, setLoading] = useState<boolean>(false)
     const [showNewPassword, setShowNewPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -39,6 +40,7 @@ export default function ResetPassword({ email, setPage }: Props) {
             return toast.error('New password and confirm password do not match')
         }
         try {
+            setLoading(true)
             const response = await axios.post('/api/users/post/reset-password', {
                 email,
                 newPassword: values.newpassword,
@@ -49,6 +51,8 @@ export default function ResetPassword({ email, setPage }: Props) {
         } catch (error: any) {
             console.log('Reset password failed: ', error);
             toast.error(error.response.data.message || error.response.data.error)
+        } finally {
+            setLoading(false)
         }
     };
     return (
@@ -59,7 +63,7 @@ export default function ResetPassword({ email, setPage }: Props) {
         >
             <Form>
                 <fieldset className="fieldset bg-base-200 border-base-300 rounded-box w-xs border p-4">
-                    <legend className="fieldset-legend">Reset Password</legend>
+                    <legend className="fieldset-legend">{loading ? 'Processing' : 'Reset Password'}</legend>
                     <div>
                         <label htmlFor='newpassword' className="label">New Password</label>
                         <div className='relative'>
@@ -98,7 +102,7 @@ export default function ResetPassword({ email, setPage }: Props) {
                         <ErrorMessage name="confirmpassword" component="div" className='text-red-600' />
                     </div>
 
-                    <button className={`btn btn-outline btn-info my-2 cursor-pointer hover:text-white`}>
+                    <button disabled={loading} className={`btn btn-outline btn-info my-2 hover:text-white ${loading ? 'cursor-not-allowed' : 'cursor-pointer'}`}>
                         Reset Password
                     </button>
                 </fieldset>

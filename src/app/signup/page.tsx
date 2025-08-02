@@ -2,9 +2,13 @@
 import React, { useState } from 'react'
 import { UserRegisterFront } from '@/types/userRegister.types';
 import SignupPage from '@/components/User/Signup components/SignupPage';
-import SendOtpPage from '@/components/User/Signup components/SendOtpPage';
+import SendOtpPage from '@/components/User/SendOtp Page';
+import toast from 'react-hot-toast';
+import axios from 'axios';
+import { useRouter } from 'next/navigation';
 
 const SignUpPage = () => {
+    const router = useRouter();
     const [page, setPage] = useState<boolean>(true)
     const [user, setUser] = useState<UserRegisterFront>({
         username: '',
@@ -14,6 +18,60 @@ const SignUpPage = () => {
     })
     const [resendTime, setResendTime] = useState<number>(30)
     const [otpActivityTime, setOtpActivityTime] = useState<number>(5 * 60)
+    const [loading, setLoading] = useState<boolean>(false)
+
+    interface OTPInfo {
+        otpCode: number | null,
+    }
+
+    const onSubmit = async (values: OTPInfo) => {
+        try {
+            setLoading(true)
+            const formData = new FormData()
+            if (!user?.profileImg) {
+                formData.append("profileImg", '');
+            } else {
+                formData.append("profileImg", user.profileImg);
+            }
+
+            formData.append("otp", String(values.otpCode));
+            formData.append("email", user.email);
+            formData.append("username", user.username);
+            formData.append("password", user.password);
+
+            const responseOtp = await axios.post('/api/users/post/verify-otp', formData, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                }
+            });
+            toast.success(responseOtp.data.message)
+            router.push('/login')
+        } catch (error: any) {
+            console.log('Otp failed: ', error);
+            toast.error(error.response.data.message || error.response.data.error)
+        } finally {
+            setLoading(false)
+        }
+    };
+
+    const resendOtpFunction = async () => {
+        setResendTime(30)
+        setOtpActivityTime(5 * 60)
+        try {
+            setLoading(true)
+            const responseOtp = await axios.post('/api/users/post/send-otp', {
+                email: user.email,
+                username: user.username,
+                password: user.password,
+            });
+            toast.success(responseOtp.data.message)
+        } catch (error: any) {
+            console.log('Resend failed: ', error);
+            toast.error(error.response.data.message || error.response.data.error)
+        } finally {
+            setLoading(false)
+        }
+    }
 
     return (
         <div className='flex items-center justify-center h-[100vh]'>
@@ -30,7 +88,10 @@ const SignUpPage = () => {
                         resendTime={resendTime}
                         otpActivityTime={otpActivityTime}
                         setResendTime={setResendTime}
-                        setOtpActivityTime={setOtpActivityTime} />
+                        setOtpActivityTime={setOtpActivityTime}
+                        onSubmitFunction={onSubmit}
+                        loading={loading}
+                        resendOtpFunction={resendOtpFunction} />
                 )
             }
         </div>

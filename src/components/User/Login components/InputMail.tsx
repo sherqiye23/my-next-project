@@ -1,5 +1,5 @@
 import axios from 'axios';
-import React from 'react'
+import React, { useState } from 'react'
 import toast from 'react-hot-toast';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
@@ -12,6 +12,7 @@ type Props = {
 };
 
 export default function InputMail({ setPage, setResendTime, setOtpActivityTime, setEmail }: Props) {
+    const [loading, setLoading] = useState<boolean>(false)
     //formik yup
     interface MailInfo {
         email: string,
@@ -25,6 +26,7 @@ export default function InputMail({ setPage, setResendTime, setOtpActivityTime, 
     const onSubmit = async (values: MailInfo) => {
         setEmail(values.email)
         try {
+            setLoading(true)
             const response = await axios.post('/api/users/post/forgot-password-send-otp', { email: values.email })
             toast.success(response.data.message)
             setPage('inputOtp')
@@ -33,6 +35,8 @@ export default function InputMail({ setPage, setResendTime, setOtpActivityTime, 
         } catch (error: any) {
             console.log('Send Otp Failed: ', error);
             toast.error(error.response.data.message || error.response.data.error)
+        } finally {
+            setLoading(false)
         }
     };
     return (
@@ -43,7 +47,7 @@ export default function InputMail({ setPage, setResendTime, setOtpActivityTime, 
         >
             <Form>
                 <fieldset className="fieldset bg-base-200 border-base-300 rounded-box w-xs border p-4">
-                    <legend className="fieldset-legend">E-mail</legend>
+                    <legend className="fieldset-legend">{loading ? 'Processing' : 'E-mail'}</legend>
                     <div>
                         <label htmlFor='email' className="label">Email</label>
                         <Field
@@ -55,7 +59,7 @@ export default function InputMail({ setPage, setResendTime, setOtpActivityTime, 
                         <ErrorMessage name="email" component="div" className='text-red-600' />
                     </div>
 
-                    <button className={`btn btn-outline btn-info my-2 cursor-pointer hover:text-white`}>
+                    <button disabled={loading} className={`btn btn-outline btn-info my-2 hover:text-white ${loading ? 'cursor-not-allowed' : 'cursor-pointer'}`}>
                         Send OTP
                     </button>
                 </fieldset>

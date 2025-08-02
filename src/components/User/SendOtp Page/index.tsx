@@ -1,55 +1,35 @@
-import axios from 'axios';
 import React, { useEffect } from 'react'
-import toast from 'react-hot-toast';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
+import { UserRegisterFront } from '@/types/userRegister.types';
 
+interface OTPInfo {
+    otpCode: number | null,
+}
 type Props = {
-    email: string;
     otpActivityTime: number;
     resendTime: number;
-    setPage: React.Dispatch<React.SetStateAction<string>>;
+    loading: boolean,
     setResendTime: React.Dispatch<React.SetStateAction<number>>;
     setOtpActivityTime: React.Dispatch<React.SetStateAction<number>>;
+    onSubmitFunction: (values: OTPInfo) => Promise<void>;
+    resendOtpFunction: () => Promise<void>;
 };
 
-export default function InputOTP({ email, otpActivityTime, resendTime, setPage, setResendTime, setOtpActivityTime }: Props) {
+type SendOtpPageProps =
+    | (Props & { email: string; user?: never })
+    | (Props & { user: UserRegisterFront; email?: never });
+
+export default function SendOtpPage({ email, user, otpActivityTime, resendTime, setResendTime, setOtpActivityTime, loading, onSubmitFunction, resendOtpFunction }: SendOtpPageProps) {
+    const finalEmail = email ?? user?.email ?? '';
+
     //formik yup
-    interface OTPInfo {
-        otpCode: number | null,
-    }
     const initialValues: OTPInfo = {
         otpCode: null,
     };
     const validationSchema = Yup.object({
         otpCode: Yup.number().required('OTP is required'),
     });
-    const onSubmit = async (values: OTPInfo) => {
-        try {
-            const responseOtp = await axios.post('/api/users/post/forgot-password-verify-otp', {
-                email,
-                otp: values.otpCode
-            });
-            toast.success(responseOtp.data.message)
-            setPage('resetPassword')
-        } catch (error: any) {
-            console.log('Otp failed: ', error);
-            toast.error(error.response.data.message || error.response.data.error)
-        }
-    };
-
-    const resendOtpFunction = async () => {
-        setResendTime(30)
-        setOtpActivityTime(5 * 60)
-        try {
-            const responseOtp = await axios.post('/api/users/post/forgot-password-send-otp', { email });
-            console.log(responseOtp);
-            toast.success(responseOtp.data.message)
-        } catch (error: any) {
-            console.log('Resend failed: ', error);
-            toast.error(error.response.data.message || error.response.data.error)
-        }
-    }
 
     useEffect(() => {
         if (resendTime <= 0) return;
@@ -75,23 +55,23 @@ export default function InputOTP({ email, otpActivityTime, resendTime, setPage, 
         <Formik
             initialValues={initialValues}
             validationSchema={validationSchema}
-            onSubmit={onSubmit}
+            onSubmit={onSubmitFunction}
         >
             <Form>
                 <fieldset className="fieldset bg-base-200 border-base-300 rounded-box w-xs border p-4">
-                    <legend className="fieldset-legend">OTP code</legend>
+                    <legend className="fieldset-legend">{loading ? 'Processing' : 'OTP code'}</legend>
                     <h1 className='font-bold text-lg text-center'>We just sent a code</h1>
                     <p className='text-center'>Enter the security code we sent to </p>
                     <p className='text-center'>
-                        <span>{email.split('@')[0][0]}</span>
+                        <span>{finalEmail.split('@')[0][0]}</span>
                         {
-                            [...Array((email.split('@')[0].length - 2))].map((_, i) => (
+                            [...Array((finalEmail.split('@')[0].length - 2))].map((_, i) => (
                                 <span key={i}>*</span>
                             ))
                         }
-                        <span>{email.split('@')[0][
-                            email.split('@')[0].length - 1
-                        ]}@{email.split('@')[1]}</span>
+                        <span>{finalEmail.split('@')[0][
+                            finalEmail.split('@')[0].length - 1
+                        ]}@{finalEmail.split('@')[1]}</span>
                     </p>
                     <div className='flex items-center justify-center'>
                         <p className='text-lg font-semibold'>
@@ -109,13 +89,13 @@ export default function InputOTP({ email, otpActivityTime, resendTime, setPage, 
                             placeholder="Enter code" />
                         <ErrorMessage name="otpCode" component="div" className='text-red-600' />
                     </div>
-                    <button type='submit' className={`btn btn-outline btn-info my-2 cursor-pointer hover:text-white`}>
+                    <button type='submit' disabled={loading} className={`btn btn-outline btn-info my-2 hover:text-white {loading ? 'cursor-not-allowed' : 'cursor-pointer'}`}>
                         Verify
                     </button>
                     <p className='text-center'>Didn't receive code?</p>
                     <div className='flex items-center justify-center'>
-                        <button type='button' onClick={() => resendOtpFunction()} 
-                        className={`text-blue-500 ${resendTime ? 'cursor-not-allowed' : 'cursor-pointer'}`}>Resend</button>
+                        <button type='button' disabled={resendTime ? true : false} onClick={() => resendOtpFunction()}
+                            className={`text-blue-500 ${resendTime ? 'cursor-not-allowed' : 'cursor-pointer'}`}>Resend</button>
                         <p>- 00:
                             {
                                 resendTime < 10 ? `0${resendTime}` : resendTime

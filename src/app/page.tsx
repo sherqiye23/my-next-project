@@ -8,6 +8,7 @@ import ThemeButton from "@/components/User/Theme";
 import Logo from '../images/TodoEast-Logo.png'
 import Image from "next/image";
 import { GoPencil } from "react-icons/go";
+import Head from "next/head";
 
 export default function Home() {
   const { userInfo, setUserInfo, isLoading } = useMyContext()
@@ -27,6 +28,10 @@ export default function Home() {
   return (
     <>
       <div className="container flex justify-between p-5">
+        {/* <Head>
+          <title>My page title</title>
+          <link rel="shortcut icon" href='../images/TodoEast-Logo.png' type="image/png" />
+        </Head> */}
         <div>
           <Image
             src={Logo}
@@ -83,6 +88,8 @@ export default function Home() {
         }}>change password</button>
 
         <ThemeButton />
+
+        <button className="bg-red-500 cursor-not-allowed p-2 rounded" onClick={() => console.log('Hello')}>salam</button>
 
 
       </div>

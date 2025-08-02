@@ -114,7 +114,7 @@ export default function FormikLogin({ setPage }: Props) {
                             className="cursor-pointer checkbox checkbox-xs checkbox-info" />
                         <label htmlFor="rememberMe" className='cursor-pointer text-sm'>Remember me</label>
                     </div>
-                    <button className={`btn btn-outline btn-info my-2 cursor-pointer hover:text-white`}>
+                    <button disabled={loading} className={`btn btn-outline btn-info my-2 hover:text-white ${loading ? 'cursor-not-allowed' : 'cursor-pointer'}`}>
                         Login
                     </button>
                     <div className='flex items-center gap-1 text-sm'>
