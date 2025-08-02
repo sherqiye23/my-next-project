@@ -1,11 +1,15 @@
 'use client';
 import { UserRegister, UserRegisterContextType } from "@/types/userRegister.types";
-import axios from "axios";
-import { createContext, useContext, useEffect, useState } from "react";
+import axios, { AxiosError } from "axios";
+import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 
 export const RegisterContext = createContext<UserRegisterContextType | null>(null)
 
-const UserEmailContext = ({ children }: any) => {
+interface Props {
+    children: ReactNode;
+}
+
+const UserEmailContext = ({ children }: Props) => {
     const [userInfo, setUserInfo] = useState<UserRegister | null>()
     const [isLoading, setIsLoading] = useState<boolean>(true)
 
@@ -14,15 +18,14 @@ const UserEmailContext = ({ children }: any) => {
             try {
                 const res = await axios.get('/api/users/get/user', { withCredentials: true });
                 setUserInfo(res.data);
-            } catch (error: any) {
-                if (error.response.status == 401) {
+            } catch (error: unknown) {
+                const axiosError = error as AxiosError;
+                if (axiosError.response?.status === 401) {
                     try {
                         const response = await axios.post('/api/users/post/refresh-token', {}, { withCredentials: true });
-                        // console.log(response);
-                        
                         const res2 = await axios.get('/api/users/get/user', { withCredentials: true });
                         setUserInfo(res2.data);
-                    } catch (error: any) {
+                    } catch (refreshError) {
                         setUserInfo(null);
                     }
                 } else {

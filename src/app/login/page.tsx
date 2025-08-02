@@ -4,7 +4,7 @@ import FormikLogin from '@/components/User/Login components/FormikLogin';
 import InputMail from '@/components/User/Login components/InputMail';
 import ResetPassword from '@/components/User/Login components/ResetPassword';
 import SendOtpPage from '@/components/User/SendOtp Page';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import toast from 'react-hot-toast';
 
 const LoginPage = () => {
@@ -27,9 +27,15 @@ const LoginPage = () => {
             });
             toast.success(responseOtp.data.message)
             setPage('resetPassword')
-        } catch (error: any) {
-            console.log('Otp failed: ', error);
-            toast.error(error.response.data.message || error.response.data.error)
+        } catch (error) {
+            const err = error as AxiosError;
+            console.log('Otp failed: ', err);
+            const message =
+                err.response?.data && typeof err.response.data === 'object'
+                    ? (err.response.data as any).message || (err.response.data as any).error
+                    : err.message;
+
+            toast.error(message || 'Something went wrong');
         } finally {
             setLoading(false)
         }
@@ -42,9 +48,15 @@ const LoginPage = () => {
             const responseOtp = await axios.post('/api/users/post/forgot-password-send-otp', { email });
             console.log(responseOtp);
             toast.success(responseOtp.data.message)
-        } catch (error: any) {
-            console.log('Resend failed: ', error);
-            toast.error(error.response.data.message || error.response.data.error)
+        } catch (error) {
+            const err = error as AxiosError;
+            console.log('Resend failed: ', err);
+            const message =
+                err.response?.data && typeof err.response.data === 'object'
+                    ? (err.response.data as any).message || (err.response.data as any).error
+                    : err.message;
+
+            toast.error(message || 'Something went wrong');
         }
     }
 

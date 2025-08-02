@@ -1,14 +1,11 @@
 'use client'
 import { useMyContext } from "@/context/UserEmailContext";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
-import { CldImage, CldUploadButton } from 'next-cloudinary';
 import ThemeButton from "@/components/User/Theme";
 import Logo from '../images/TodoEast-Logo.png'
 import Image from "next/image";
-import { GoPencil } from "react-icons/go";
-import Head from "next/head";
 
 export default function Home() {
   const { userInfo, setUserInfo, isLoading } = useMyContext()
@@ -18,20 +15,23 @@ export default function Home() {
       const response = await axios.post('/api/users/post/logout', {})
       setUserInfo(null)
       toast.success(response.data.message)
-    } catch (err: any) {
-      console.log(err);
-      toast.error('Failed logout')
+    } catch (error) {
+      const err = error as AxiosError;
+      console.log('Logout failed: ', err);
+      const message =
+        err.response?.data && typeof err.response.data === 'object'
+          ? (err.response.data as any).message || (err.response.data as any).error
+          : err.message;
+
+      toast.error(message || 'Something went wrong');
     }
   }
   console.log(userInfo);
 
   return (
-    <>
+    <div>
+      {/* logo */}
       <div className="container flex justify-between p-5">
-        {/* <Head>
-          <title>My page title</title>
-          <link rel="shortcut icon" href='../images/TodoEast-Logo.png' type="image/png" />
-        </Head> */}
         <div>
           <Image
             src={Logo}
@@ -41,9 +41,9 @@ export default function Home() {
           />
         </div>
       </div>
-      selamunaleykum dunya
 
       <div>
+        {/* user signup logout */}
         {
           isLoading ? (
             <h1 className="text-purple-400">...loading</h1>
@@ -61,38 +61,11 @@ export default function Home() {
             )
           )
         }
-        <div>
 
-          <CldUploadButton
-            uploadPreset="preset_name"
-            onSuccess={(result: any) => {
-              console.log("Success ilə:", result);
-              console.log('Backende post atacagin: ', result.info.path);
-            }}
-          >
-            <button className="bg-blue-500 text-white px-4 py-2 rounded">
-              Şəkil Yüklə
-            </button>
-          </CldUploadButton>
-
-        </div>
-
-        <button className="bg-red-400" onClick={async () => {
-          const id = userInfo?.id
-          const oldPassword = 'User123!'
-          const newPassword = 'User123!'
-          const confirmPassword = 'User123!'
-          const response = await axios.put(`/api/users/put/updatepassword?userId=${id}&oldPassword=${oldPassword}&newPassword=${newPassword}&confirmPassword=${confirmPassword}`, null, { withCredentials: true })
-          console.log(response);
-
-        }}>change password</button>
-
+        {/* theme button */}
         <ThemeButton />
 
-        <button className="bg-red-500 cursor-not-allowed p-2 rounded" onClick={() => console.log('Hello')}>salam</button>
-
-
       </div>
-    </>
+    </div>
   );
 }

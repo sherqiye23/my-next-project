@@ -92,7 +92,7 @@ export default function SendOtpPage({ email, user, otpActivityTime, resendTime, 
                     <button type='submit' disabled={loading} className={`btn btn-outline btn-info my-2 hover:text-white {loading ? 'cursor-not-allowed' : 'cursor-pointer'}`}>
                         Verify
                     </button>
-                    <p className='text-center'>Didn't receive code?</p>
+                    <p className='text-center'>Didn&apos;t receive code?</p>
                     <div className='flex items-center justify-center'>
                         <button type='button' disabled={resendTime ? true : false} onClick={() => resendOtpFunction()}
                             className={`text-blue-500 ${resendTime ? 'cursor-not-allowed' : 'cursor-pointer'}`}>Resend</button>

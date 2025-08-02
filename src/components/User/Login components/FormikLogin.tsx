@@ -1,5 +1,5 @@
 import { useMyContext } from '@/context/UserEmailContext';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import Link from 'next/link'
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react'
@@ -45,9 +45,15 @@ export default function FormikLogin({ setPage }: Props) {
             } else {
                 toast.error(response.data.error.message)
             }
-        } catch (error: any) {
-            console.log('Login failed: ', error);
-            toast.error(error.response.data.message || error.response.data.error)
+        } catch (error) {
+            const err = error as AxiosError;
+            console.log('Login failed: ', err);
+            const message =
+                err.response?.data && typeof err.response.data === 'object'
+                    ? (err.response.data as any).message || (err.response.data as any).error
+                    : err.message;
+
+            toast.error(message || 'Something went wrong');
         } finally {
             setLoading(false)
         }
@@ -127,7 +133,7 @@ export default function FormikLogin({ setPage }: Props) {
                         Login with Google
                     </button>
                     <div className='flex items-center justify-center gap-1 text-sm'>
-                        <span>Don't have an account yet?</span>
+                        <span>Don&apos;t have an account yet?</span>
                         <Link href='/signup' className='font-semibold transition-all duration-250 ease-in hover:text-blue-400'>Sign up</Link>
                     </div>
                 </fieldset>

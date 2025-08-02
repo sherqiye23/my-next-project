@@ -1,7 +1,7 @@
 import toast from 'react-hot-toast';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import Link from 'next/link'
 import React, { useRef, useState } from 'react';
 import { LuEye, LuEyeClosed, LuLogIn, LuUserPlus } from "react-icons/lu";
@@ -61,9 +61,15 @@ export default function SignupPage({ setUser, setPage, setResendTime, setOtpActi
             console.log(responseOtp);
             setPage(false)
             toast.success("Otp code send to your email!")
-        } catch (error: any) {
-            console.log('Signup failed: ', error);
-            toast.error(error.response.data.message || error.response.data.error || 'Error')
+        } catch (error) {
+            const err = error as AxiosError;
+            console.log('Signup failed: ', err);
+            const message =
+                err.response?.data && typeof err.response.data === 'object'
+                    ? (err.response.data as any).message || (err.response.data as any).error
+                    : err.message;
+
+            toast.error(message || 'Something went wrong');
         } finally {
             setLoading(false)
         }

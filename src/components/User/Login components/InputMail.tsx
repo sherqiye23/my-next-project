@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import React, { useState } from 'react'
 import toast from 'react-hot-toast';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
@@ -32,9 +32,15 @@ export default function InputMail({ setPage, setResendTime, setOtpActivityTime, 
             setPage('inputOtp')
             setResendTime(30)
             setOtpActivityTime(5 * 60)
-        } catch (error: any) {
-            console.log('Send Otp Failed: ', error);
-            toast.error(error.response.data.message || error.response.data.error)
+        } catch (error) {
+            const err = error as AxiosError;
+            console.log('Send Otp Failed: ', err);
+            const message =
+                err.response?.data && typeof err.response.data === 'object'
+                    ? (err.response.data as any).message || (err.response.data as any).error
+                    : err.message;
+
+            toast.error(message || 'Something went wrong');
         } finally {
             setLoading(false)
         }

@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import User from "@/models/userModel";
 import Favorites from "@/models/favoritesModel";
+import { Error as MongooseError } from 'mongoose';
 
 const SECRET = process.env.JWT_SECRET!;
 interface MyJwtPayload extends JwtPayload {
@@ -41,11 +42,14 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
         await Favorites.findByIdAndDelete(deletedUser.favoritesId);
         await User.findByIdAndDelete(userId);
         return NextResponse.json({ message: `User deleted` }, { status: 200 });
-    } catch (error: any) {
-        if (error) {
+    } catch (error: unknown) {
+        if (error instanceof MongooseError.ValidationError) {
             const errors = Object.values(error.errors).map((el: any) => el.message);
             return NextResponse.json({ error: errors.join(', ') }, { status: 400 });
         }
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        if (error instanceof Error) {
+            return NextResponse.json({ error: error.message }, { status: 500 });
+        }
+        return NextResponse.json({ error: 'Unknown error' }, { status: 500 });
     }
 }

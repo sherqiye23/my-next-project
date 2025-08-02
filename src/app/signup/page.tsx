@@ -4,7 +4,7 @@ import { UserRegisterFront } from '@/types/userRegister.types';
 import SignupPage from '@/components/User/Signup components/SignupPage';
 import SendOtpPage from '@/components/User/SendOtp Page';
 import toast from 'react-hot-toast';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import { useRouter } from 'next/navigation';
 
 const SignUpPage = () => {
@@ -46,9 +46,15 @@ const SignUpPage = () => {
             });
             toast.success(responseOtp.data.message)
             router.push('/login')
-        } catch (error: any) {
-            console.log('Otp failed: ', error);
-            toast.error(error.response.data.message || error.response.data.error)
+        } catch (error) {
+            const err = error as AxiosError;
+            console.log('Otp failed: ', err);
+            const message =
+                err.response?.data && typeof err.response.data === 'object'
+                    ? (err.response.data as any).message || (err.response.data as any).error
+                    : err.message;
+
+            toast.error(message || 'Something went wrong');
         } finally {
             setLoading(false)
         }
@@ -65,9 +71,15 @@ const SignUpPage = () => {
                 password: user.password,
             });
             toast.success(responseOtp.data.message)
-        } catch (error: any) {
-            console.log('Resend failed: ', error);
-            toast.error(error.response.data.message || error.response.data.error)
+        } catch (error) {
+            const err = error as AxiosError;
+            console.log('Resend failed: ', err);
+            const message =
+                err.response?.data && typeof err.response.data === 'object'
+                    ? (err.response.data as any).message || (err.response.data as any).error
+                    : err.message;
+
+            toast.error(message || 'Something went wrong');
         } finally {
             setLoading(false)
         }
