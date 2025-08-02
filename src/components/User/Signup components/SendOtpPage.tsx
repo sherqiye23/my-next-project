@@ -28,11 +28,22 @@ export default function SendOtpPage({ user, resendTime, otpActivityTime, setRese
     });
     const onSubmit = async (values: OTPInfo) => {
         try {
-            const responseOtp = await axios.post('/api/users/post/verify-otp', {
-                email: user.email,
-                username: user.username,
-                password: user.password,
-                otp: values.otpCode
+            const formData = new FormData()
+            if (!user?.profileImg) {
+                formData.append("profileImg", '');
+            } else {
+                formData.append("profileImg", user.profileImg);
+            }
+            
+            formData.append("otp", String(values.otpCode));
+            formData.append("email", user.email);
+            formData.append("username", user.username);
+            formData.append("password", user.password);
+
+            const responseOtp = await axios.post('/api/users/post/verify-otp', formData, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                }
             });
             toast.success(responseOtp.data.message)
             router.push('/login')

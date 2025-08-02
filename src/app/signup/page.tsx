@@ -9,7 +9,8 @@ const SignUpPage = () => {
     const [user, setUser] = useState<UserRegisterFront>({
         username: '',
         email: '',
-        password: ''
+        password: '',
+        profileImg: null
     })
     const [resendTime, setResendTime] = useState<number>(30)
     const [otpActivityTime, setOtpActivityTime] = useState<number>(5 * 60)

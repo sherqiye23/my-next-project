@@ -12,20 +12,20 @@ export async function GET(request: NextRequest) {
 
         const token = accessToken || refreshToken;
         if (!token) {
-            return NextResponse.json({ error: "Token tapılmadı" }, { status: 401 });
+            return NextResponse.json({ error: "Token not found" }, { status: 404 });
         }
         // Tokeni yoxla
         let payload: any;
         try {
             payload = jwt.verify(token, process.env.JWT_SECRET!);
         } catch (err) {
-            return NextResponse.json({ error: "Token etibarsızdır" }, { status: 401 });
+            return NextResponse.json({ error: "Token is invalid" }, { status: 401 });
         }
 
         // find user from db
         const user = await User.findById(payload.userId).select("-password");
         if (!user) {
-            return NextResponse.json({ error: "İstifadəçi tapılmadı" }, { status: 404 });
+            return NextResponse.json({ error: "User not found" }, { status: 404 });
         }
 
         // success and response userinfo

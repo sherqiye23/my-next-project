@@ -2,6 +2,7 @@ import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import User from "@/models/userModel";
+import Favorites from "@/models/favoritesModel";
 
 const SECRET = process.env.JWT_SECRET!;
 interface MyJwtPayload extends JwtPayload {
@@ -9,7 +10,6 @@ interface MyJwtPayload extends JwtPayload {
     email: string;
     isAdmin: boolean;
 }
-
 
 export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
     try {
@@ -36,7 +36,9 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
         if (!decoded.isAdmin) {
             return NextResponse.json({ message: "You are not admin" }, { status: 403 });
         }
-
+        // all todolists, all comment deleted
+        // chat and messages deleted user
+        await Favorites.findByIdAndDelete(deletedUser.favoritesId);
         await User.findByIdAndDelete(userId);
         return NextResponse.json({ message: `User deleted` }, { status: 200 });
     } catch (error: any) {

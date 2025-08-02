@@ -4,11 +4,14 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { CldImage, CldUploadButton } from 'next-cloudinary';
+import ThemeButton from "@/components/User/Theme";
+import Logo from '../images/TodoEast-Logo.png'
+import Image from "next/image";
+import { GoPencil } from "react-icons/go";
 
 export default function Home() {
   const { userInfo, setUserInfo, isLoading } = useMyContext()
   const route = useRouter()
-
   const logOutFunction = async () => {
     try {
       const response = await axios.post('/api/users/post/logout', {})
@@ -21,10 +24,20 @@ export default function Home() {
   }
   console.log(userInfo);
 
-
   return (
     <>
+      <div className="container flex justify-between p-5">
+        <div>
+          <Image
+            src={Logo}
+            alt="Logo"
+            className="object-cover cursor-pointer w-[150px]"
+            layout="intrinsic"
+          />
+        </div>
+      </div>
       selamunaleykum dunya
+
       <div>
         {
           isLoading ? (
@@ -68,6 +81,10 @@ export default function Home() {
           console.log(response);
 
         }}>change password</button>
+
+        <ThemeButton />
+
+
       </div>
     </>
   );

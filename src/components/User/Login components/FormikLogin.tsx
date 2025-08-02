@@ -60,10 +60,10 @@ export default function FormikLogin({ setPage }: Props) {
             onSubmit={onSubmit}
         >
             <Form>
-                <fieldset className="fieldset bg-base-200 border-base-300 rounded-box w-xs border p-4">
+                <fieldset className="fieldset border-base-300 rounded-box w-xs border p-4 bg-[var(--component-bg)]">
                     <legend className="fieldset-legend">{loading ? 'Processing' : 'Login'}</legend>
-                    <div className='bg-white my-2 mx-auto w-max flex items-center justify-center rounded-lg gap-2 cursor-pointer'>
-                        <div className='flex items-center justify-center px-1 border rounded-lg gap-1'>
+                    <div className='bg-white p-[1px] my-2 mx-auto w-max flex items-center justify-center rounded-lg gap-2 cursor-pointer'>
+                        <div className='flex items-center justify-center px-1 border rounded-lg gap-1 text-black'>
                             <span><LuLogIn /></span>
                             <span>Login</span>
                         </div>

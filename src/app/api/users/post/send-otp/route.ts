@@ -89,7 +89,7 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ message: 'Failed to send OTP email' }, { status: 500 });
         }
 
-        return NextResponse.json({ message: "OTP göndərildi. Aktivlik müddəti 5 dəqiqədir" });
+        return NextResponse.json({ message: "OTP sent. Validity period is 5 minutes" });
 
     } catch (error: any) {
         if (error) {
