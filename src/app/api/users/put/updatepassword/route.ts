@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import bcryptjs from 'bcryptjs'
 import mongoose from 'mongoose';
 
-export async function PUT(request: NextRequest, { }) {
+export async function PUT(request: NextRequest) {
     try {
         const url = new URL(request.url);
         const userId = url.searchParams.get("userId");

@@ -4,6 +4,13 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 import User from "@/models/userModel";
 import Favorites from "@/models/favoritesModel";
 import mongoose from 'mongoose';
+import type { NextApiRequest } from "next";
+
+interface Context {
+  params: Promise<{
+    id: string;
+  }>;
+}
 
 const SECRET = process.env.JWT_SECRET!;
 interface MyJwtPayload extends JwtPayload {
@@ -12,8 +19,13 @@ interface MyJwtPayload extends JwtPayload {
     isAdmin: boolean;
 }
 
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(
+    request: NextRequest,
+    context: Context
+) {
     try {
+        const { id } = await context.params;
+
         const cookieStore = await cookies();
         const token = cookieStore.get("accessToken")?.value;
 
@@ -28,7 +40,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
             return NextResponse.json({ message: "Token is invalid" }, { status: 401 });
         }
 
-        const userId = params.id;
+        const userId = id;
         const deletedUser = await User.findOne({ _id: userId })
         if (!deletedUser) {
             return NextResponse.json({ message: "User is not found" }, { status: 404 });

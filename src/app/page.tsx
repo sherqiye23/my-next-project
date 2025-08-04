@@ -7,6 +7,11 @@ import ThemeButton from "@/components/User/Theme";
 import Logo from '../images/TodoEast-Logo.png'
 import Image from "next/image";
 
+interface ErrorResponseData {
+  message?: string;
+  error?: string;
+}
+
 export default function Home() {
   const { userInfo, setUserInfo, isLoading } = useMyContext()
   const route = useRouter()
@@ -18,11 +23,8 @@ export default function Home() {
     } catch (error) {
       const err = error as AxiosError;
       console.log('Logout failed: ', err);
-      const message =
-        err.response?.data && typeof err.response.data === 'object'
-          ? (err.response.data as any).message || (err.response.data as any).error
-          : err.message;
-
+      const data = err.response?.data as ErrorResponseData;
+      const message = data?.message || data?.error || err.message;
       toast.error(message || 'Something went wrong');
     }
   }

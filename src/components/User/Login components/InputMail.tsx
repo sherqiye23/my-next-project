@@ -11,6 +11,11 @@ type Props = {
     setEmail: React.Dispatch<React.SetStateAction<string>>;
 };
 
+interface ErrorResponseData {
+    message?: string;
+    error?: string;
+}
+
 export default function InputMail({ setPage, setResendTime, setOtpActivityTime, setEmail }: Props) {
     const [loading, setLoading] = useState<boolean>(false)
     //formik yup
@@ -35,11 +40,8 @@ export default function InputMail({ setPage, setResendTime, setOtpActivityTime, 
         } catch (error) {
             const err = error as AxiosError;
             console.log('Send Otp Failed: ', err);
-            const message =
-                err.response?.data && typeof err.response.data === 'object'
-                    ? (err.response.data as any).message || (err.response.data as any).error
-                    : err.message;
-
+            const data = err.response?.data as ErrorResponseData;
+            const message = data?.message || data?.error || err.message;
             toast.error(message || 'Something went wrong');
         } finally {
             setLoading(false)

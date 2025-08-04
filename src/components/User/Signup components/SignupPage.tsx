@@ -15,6 +15,11 @@ type Props = {
     setOtpActivityTime: React.Dispatch<React.SetStateAction<number>>;
 };
 
+interface ErrorResponseData {
+    message?: string;
+    error?: string;
+}
+
 export default function SignupPage({ setUser, setPage, setResendTime, setOtpActivityTime }: Props) {
     const [loading, setLoading] = useState<boolean>(false)
     const [showPassword, setShowPassword] = useState(false);
@@ -64,11 +69,8 @@ export default function SignupPage({ setUser, setPage, setResendTime, setOtpActi
         } catch (error) {
             const err = error as AxiosError;
             console.log('Signup failed: ', err);
-            const message =
-                err.response?.data && typeof err.response.data === 'object'
-                    ? (err.response.data as any).message || (err.response.data as any).error
-                    : err.message;
-
+            const data = err.response?.data as ErrorResponseData;
+            const message = data?.message || data?.error || err.message;
             toast.error(message || 'Something went wrong');
         } finally {
             setLoading(false)

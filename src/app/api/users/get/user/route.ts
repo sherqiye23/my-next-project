@@ -1,10 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
-import jwt from "jsonwebtoken";
+import jwt, { JwtPayload } from "jsonwebtoken";
 import { connect } from "@/dbConfig/dbConfig";
 import mongoose from 'mongoose';
 import User from "@/models/userModel";
 
 connect();
+
+interface MyJwtPayload extends JwtPayload {
+  id: string;
+  email: string;
+  isAdmin: boolean;
+}
 
 export async function GET(request: NextRequest) {
     try {
@@ -16,9 +22,9 @@ export async function GET(request: NextRequest) {
             return NextResponse.json({ error: "Token not found" }, { status: 404 });
         }
         // Tokeni yoxla
-        let payload: any;
+        let payload: MyJwtPayload;
         try {
-            payload = jwt.verify(token, process.env.JWT_SECRET!);
+            payload = jwt.verify(token, process.env.JWT_SECRET!) as MyJwtPayload;
         } catch (err) {
             return NextResponse.json({ error: "Token is invalid" }, { status: 401 });
         }
