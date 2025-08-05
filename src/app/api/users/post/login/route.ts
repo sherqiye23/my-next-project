@@ -23,6 +23,13 @@ export async function POST(request: NextRequest) {
             );
         }
 
+        if (!user.password) {
+            return NextResponse.json(
+                { message: 'You signed up with Google. Please use "Forgot Password" to set a password' },
+                { status: 403 },
+            );
+        }
+
         // compare entered password with hashed password in DB
         const isPasswordCorrect = await bcryptjs.compare(password, user.password);
 

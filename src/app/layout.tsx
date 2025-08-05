@@ -3,6 +3,9 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "react-hot-toast";
 import UserEmailContext from "@/context/UserEmailContext";
+import SessionProvider from '../components/SessionProvider'
+import { getServerSession } from "next-auth";
+import NavMenu from "@/components/NavMenu";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -22,11 +25,13 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const session = await getServerSession()
+
   return (
     <html lang="en" >
       <head>
@@ -50,10 +55,13 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <UserEmailContext>
-          <Toaster position="top-center" />
-          {children}
-        </UserEmailContext>
+        <SessionProvider session={session}>
+          <UserEmailContext>
+            <Toaster position="top-center" />
+            <NavMenu />
+            {children}
+          </UserEmailContext>
+        </SessionProvider>
       </body>
     </html>
   );

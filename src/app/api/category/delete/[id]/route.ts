@@ -6,9 +6,9 @@ import Favorites from "@/models/favoritesModel";
 import mongoose from 'mongoose';
 
 interface Context {
-  params: Promise<{
-    id: string;
-  }>;
+    params: Promise<{
+        id: string;
+    }>;
 }
 
 const SECRET = process.env.JWT_SECRET!;
@@ -17,7 +17,7 @@ interface MyJwtPayload extends JwtPayload {
     email: string;
     isAdmin: boolean;
 }
-
+// dueldessena bunu
 export async function DELETE(
     request: NextRequest,
     context: Context

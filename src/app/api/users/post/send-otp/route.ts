@@ -25,6 +25,13 @@ export async function POST(request: NextRequest) {
             }, { status: 400 });
         }
 
+        if (username.trim().length > 30) {
+            return NextResponse.json({
+                message: 'Username maximum 30 characters',
+                success: false
+            }, { status: 400 });
+        }
+
         // check email
         if (!email.trim()) {
             return NextResponse.json({

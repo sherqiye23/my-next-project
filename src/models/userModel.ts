@@ -17,6 +17,7 @@ const userSchema = new mongoose.Schema<IUser>(
             type: String,
             required: [true, 'Username is required'],
             unique: true,
+            maxlength: 30,
         },
         email: {
             type: String,
@@ -31,7 +32,7 @@ const userSchema = new mongoose.Schema<IUser>(
         },
         password: {
             type: String,
-            required: [true, 'Password is required'],
+            // required: [true, 'Password is required'],
         },
         isAdmin: {
             type: Boolean,

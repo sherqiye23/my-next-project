@@ -3,19 +3,22 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 import { connect } from "@/dbConfig/dbConfig";
 import mongoose from 'mongoose';
 import User from "@/models/userModel";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 connect();
 
 interface MyJwtPayload extends JwtPayload {
-  id: string;
-  email: string;
-  isAdmin: boolean;
+    id: string;
+    email: string;
+    isAdmin: boolean;
 }
 
 export async function GET(request: NextRequest) {
     try {
         const refreshToken = request.cookies.get("refreshToken")?.value;
         const accessToken = request.cookies.get("accessToken")?.value;
+        // const session = await getServerSession(authOptions);
 
         const token = accessToken || refreshToken;
         if (!token) {
@@ -40,7 +43,8 @@ export async function GET(request: NextRequest) {
             id: user._id,
             username: user.username,
             email: user.email,
-            isAdmin: user.isAdmin
+            isAdmin: user.isAdmin,
+            profileImg: user.profileImg
         });
     } catch (error: unknown) {
         if (error instanceof mongoose.Error.ValidationError) {
