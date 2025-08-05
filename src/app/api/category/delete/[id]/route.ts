@@ -1,9 +1,8 @@
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import jwt, { JwtPayload } from "jsonwebtoken";
-import User from "@/models/userModel";
-import Favorites from "@/models/favoritesModel";
 import mongoose from 'mongoose';
+import Category from "@/models/categoryModel";
 
 interface Context {
     params: Promise<{
@@ -17,7 +16,7 @@ interface MyJwtPayload extends JwtPayload {
     email: string;
     isAdmin: boolean;
 }
-// dueldessena bunu
+
 export async function DELETE(
     request: NextRequest,
     context: Context
@@ -29,7 +28,7 @@ export async function DELETE(
         const token = cookieStore.get("accessToken")?.value;
 
         if (!token) {
-            return NextResponse.json({ message: "Token is not found" }, { status: 401 });
+            return NextResponse.json({ message: "Token is not found" }, { status: 404 });
         }
 
         let decoded;
@@ -39,20 +38,24 @@ export async function DELETE(
             return NextResponse.json({ message: "Token is invalid" }, { status: 401 });
         }
 
-        const userId = id;
-        const deletedUser = await User.findOne({ _id: userId })
-        if (!deletedUser) {
-            return NextResponse.json({ message: "User is not found" }, { status: 404 });
-        }
-
         if (!decoded.isAdmin) {
             return NextResponse.json({ message: "You are not admin" }, { status: 403 });
         }
-        // all todolists, all comment deleted
-        // chat and messages deleted user
-        await Favorites.findByIdAndDelete(deletedUser.favoritesId);
-        await User.findByIdAndDelete(userId);
-        return NextResponse.json({ message: `User deleted` }, { status: 200 });
+
+        const categoryId = id;
+        const deletedCategory = await Category.findOne({ _id: categoryId })
+        if (!deletedCategory) {
+            return NextResponse.json({ message: "Category is not found" }, { status: 404 });
+        }
+
+        // all todolists category ise null olacaq ve filterlemede otherde gosterilecek
+        // await TodoList.updateMany(
+        //     { categoryId: categoryId },
+        //     { $set: { categoryId: null, categoryDeleted: true } }
+        // );
+
+        await Category.findByIdAndDelete(categoryId);
+        return NextResponse.json({ message: `Category deleted` }, { status: 200 });
     } catch (error: unknown) {
         if (error instanceof mongoose.Error.ValidationError) {
             const errors = Object.values(error.errors).map(el => {
