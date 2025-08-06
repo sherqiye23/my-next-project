@@ -4,7 +4,7 @@ import { connect } from "@/dbConfig/dbConfig";
 import mongoose from 'mongoose';
 import User from "@/models/userModel";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth";
 
 connect();
 
