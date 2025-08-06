@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 import ThemeButton from "@/components/User/Theme";
 import Logo from '../images/TodoEast-Logo.png'
 import Image from "next/image";
+import { useSession, signOut as nextAuthSignOut } from "next-auth/react";
 
 interface ErrorResponseData {
   message?: string;
@@ -14,19 +15,26 @@ interface ErrorResponseData {
 
 export default function Home() {
   const { userInfo, setUserInfo, isLoading } = useMyContext()
+  const { data: session } = useSession();
   const route = useRouter()
+
   const logOutFunction = async () => {
-    try {
-      const response = await axios.post('/api/users/post/logout', {})
-      setUserInfo(null)
-      toast.success(response.data.message)
-    } catch (error) {
-      const err = error as AxiosError;
-      console.log('Logout failed: ', err);
-      const data = err.response?.data as ErrorResponseData;
-      const message = data?.message || data?.error || err.message;
-      toast.error(message || 'Something went wrong');
+    if (session) {
+      await nextAuthSignOut();
+    } else {
+      try {
+        const response = await axios.post('/api/users/post/logout', {})
+        setUserInfo(null)
+        toast.success(response.data.message)
+      } catch (error) {
+        const err = error as AxiosError;
+        console.log('Logout failed: ', err);
+        const data = err.response?.data as ErrorResponseData;
+        const message = data?.message || data?.error || err.message;
+        toast.error(message || 'Something went wrong');
+      }
     }
+    route.push('/');
   }
   console.log(userInfo);
 

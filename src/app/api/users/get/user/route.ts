@@ -16,15 +16,32 @@ interface MyJwtPayload extends JwtPayload {
 
 export async function GET(request: NextRequest) {
     try {
+        // session control
+        const session = await getServerSession(authOptions);
+
+        if (session) {
+            const user = await User.findById(session.user.id).select("-password");
+            if (!user) {
+                return NextResponse.json({ error: "User not found" }, { status: 404 });
+            }
+            return NextResponse.json({
+                id: user._id,
+                username: user.username,
+                email: user.email,
+                isAdmin: user.isAdmin,
+                profileImg: user.profileImg
+            });
+        }
+
+        // token control
         const refreshToken = request.cookies.get("refreshToken")?.value;
         const accessToken = request.cookies.get("accessToken")?.value;
-        // const session = await getServerSession(authOptions);
-
         const token = accessToken || refreshToken;
+
         if (!token) {
             return NextResponse.json({ error: "Token not found" }, { status: 404 });
         }
-        // Tokeni yoxla
+
         let payload: MyJwtPayload;
         try {
             payload = jwt.verify(token, process.env.JWT_SECRET!) as MyJwtPayload;

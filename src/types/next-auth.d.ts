@@ -3,20 +3,27 @@ import { DefaultSession } from "next-auth";
 
 declare module "next-auth" {
     interface Session {
-        accessToken?: unknown;
         user: {
-            id?: string;
-            isAdmin?: boolean;
-            username?: string;
-            profileImg?: string;
+            id: string;
+            isAdmin: boolean;
+            username: string;
+            profileImg?: string | null;
         } & DefaultSession["user"];
     }
 
+    interface User extends DefaultUser {
+        id: string;
+        isAdmin: boolean;
+        username: string;
+        profileImg?: string | null;
+    }
+}
+
+declare module "next-auth/jwt" {
     interface JWT {
-        accessToken?: string;
-        id?: string;
-        isAdmin?: boolean;
-        username?: string;
-        profileImg?: string;
+        id: string;
+        isAdmin: boolean;
+        username: string;
+        profileImg?: string | null;
     }
 }

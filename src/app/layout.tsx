@@ -5,7 +5,6 @@ import { Toaster } from "react-hot-toast";
 import UserEmailContext from "@/context/UserEmailContext";
 import SessionProvider from '../components/SessionProvider'
 import { getServerSession } from "next-auth";
-import NavMenu from "@/components/NavMenu";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -58,7 +57,6 @@ export default async function RootLayout({
         <SessionProvider session={session}>
           <UserEmailContext>
             <Toaster position="top-center" />
-            <NavMenu />
             {children}
           </UserEmailContext>
         </SessionProvider>
