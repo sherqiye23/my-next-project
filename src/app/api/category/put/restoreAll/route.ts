@@ -41,7 +41,7 @@ export async function PUT() {
             { isSoftDeleted: true },
             { $set: { isSoftDeleted: false } }
         );
-        return NextResponse.json({ message: `${result.modifiedCount} categories restored` }, { status: 200 });
+        return NextResponse.json({ message: `${result.modifiedCount} category restored` }, { status: 200 });
 
     } catch (error: unknown) {
         if (error instanceof mongoose.Error.ValidationError) {

@@ -5,7 +5,7 @@ import mongoose from 'mongoose';
 export async function POST(request: NextRequest) {
     try {
         const reqBody = await request.json()
-        const { userId, name, isCustom } = reqBody
+        const { userId, name, isCustom, color } = reqBody
 
         if (!name.trim()) {
             return NextResponse.json({
@@ -23,14 +23,14 @@ export async function POST(request: NextRequest) {
         const findedName = await Category.findOne({ createdById: userId, name })
         const findedCustom = await Category.findOne({ isCustom: false, name })
 
-        if (!findedCustom.isSoftDeleted) {
+        if (findedCustom && !findedCustom.isSoftDeleted) {
             return NextResponse.json({
                 message: 'Category already created by admin',
                 success: false
             }, { status: 400 });
         }
 
-        if (!findedName.isSoftDeleted && findedName) {
+        if (findedName && !findedName.isSoftDeleted) {
             return NextResponse.json({
                 message: 'Category already created by you',
                 success: false
@@ -40,7 +40,8 @@ export async function POST(request: NextRequest) {
         const newCategory = new Category({
             name,
             isCustom,
-            createdById: userId
+            createdById: userId,
+            ...(color && { color }),
         })
 
         const savedCategory = await newCategory.save()

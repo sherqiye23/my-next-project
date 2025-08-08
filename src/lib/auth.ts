@@ -3,8 +3,14 @@ import { NextAuthOptions } from "next-auth";
 import User from "@/models/userModel";
 import { connect } from "@/dbConfig/dbConfig";
 import Favorites from "@/models/favoritesModel";
+import cloudinary from "@/lib/cloudinary";
 
 connect()
+
+type CloudinaryResultType = {
+    secure_url: string;
+    public_id: string;
+};
 
 export const authOptions: NextAuthOptions = {
     providers: [
@@ -25,11 +31,45 @@ export const authOptions: NextAuthOptions = {
                 const existingUser = await User.findOne({ email: user.email });
 
                 if (!existingUser) {
+                    // image upload cloudinary
+                    let sendProfileImg;
+                    if (user.image) {
+                        const response = await fetch(user.image);
+                        const arrayBuffer = await response.arrayBuffer();
+                        const buffer = Buffer.from(arrayBuffer);
+
+                        const result: CloudinaryResultType = await new Promise((resolve, reject) => {
+                            const uploadStream = cloudinary.uploader.upload_stream(
+                                { folder: 'profile-images' },
+                                (error, uploadResult) => {
+                                    if (error) {
+                                        return reject(error);
+                                    }
+                                    resolve(uploadResult as CloudinaryResultType);
+                                }
+                            );
+                            uploadStream.end(buffer);
+                        });
+                        const fullImageUrl = result.secure_url;
+                        const uploadIndex = fullImageUrl.indexOf("/upload/");
+                        let shortImageUrl = fullImageUrl;
+
+                        if (uploadIndex !== -1) {
+                            shortImageUrl = fullImageUrl.substring(uploadIndex + "/upload/".length);
+                        }
+                        sendProfileImg = shortImageUrl
+
+                    } else if (user.image === '') {
+                        sendProfileImg = null
+                    } else {
+                        console.log("Invalid profile picture format")
+                    }
+
                     const newUser = new User({
                         username: user.name?.split(" ").join("") || "user",
                         email: user.email,
                         password: "",
-                        ...(user.image && { profileImg: user.image }),
+                        ...(sendProfileImg && { profileImg: sendProfileImg }),
                     });
 
                     const savedUser = await newUser.save();

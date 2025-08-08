@@ -6,6 +6,7 @@ export interface ICategory extends Document {
     isCustom: boolean,
     isSoftDeleted: boolean,
     todoListIds: string[],
+    color: string
 }
 
 const categorySchema = new mongoose.Schema<ICategory>(
@@ -30,6 +31,10 @@ const categorySchema = new mongoose.Schema<ICategory>(
             type: [String],
             default: []
         },
+        color: {
+            type: String,
+            default: '#b3b3b3'
+        }
     },
     { timestamps: { createdAt: true, updatedAt: false } }
 )

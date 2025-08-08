@@ -5,7 +5,7 @@ import mongoose from 'mongoose';
 export async function PUT(request: NextRequest) {
     try {
         const reqBody = await request.json()
-        const { userId, name, categoryId } = reqBody
+        const { userId, name, categoryId, color } = reqBody
 
         const trimmedName = name.trim();
 
@@ -45,7 +45,10 @@ export async function PUT(request: NextRequest) {
             }, { status: 400 });
         }
 
-        await Category.findByIdAndUpdate(categoryId, { name: trimmedName });
+        await Category.findByIdAndUpdate(categoryId, {
+            name: trimmedName,
+            ...(color && { color })
+        });
 
         return NextResponse.json({
             message: 'Category updated successfully!',
