@@ -54,21 +54,21 @@ export default function Home() {
 
       <div>
         <button onClick={async () => {
-          try {
-            const response = await axios.put('/api/users/put/updateinfo', {
-              userId: "6895e8b03f3521e1d2228120",
-              username: "Wergie",
-              profileImg: '',
-            })
-            console.log(response)
-            toast.success(response.data.message)
-          } catch (error) {
-            const err = error as AxiosError;
-            console.log('Post failed: ', err);
-            const data = err.response?.data as ErrorResponseData;
-            const message = data?.message || data?.error || err.message;
-            toast.error(message || 'Something went wrong');
-          }
+          // try {
+          //   const response = await axios.put('/api/users/put/updateinfo', {
+          //     userId: "6895e8b03f3521e1d2228120",
+          //     username: "Wergie",
+          //     profileImg: '',
+          //   })
+          //   console.log(response)
+          //   toast.success(response.data.message)
+          // } catch (error) {
+          //   const err = error as AxiosError;
+          //   console.log('Post failed: ', err);
+          //   const data = err.response?.data as ErrorResponseData;
+          //   const message = data?.message || data?.error || err.message;
+          //   toast.error(message || 'Something went wrong');
+          // }
         }}
           className="p-1 bg-red-500 rounded cursor-pointer">Send Category</button>
       </div>
