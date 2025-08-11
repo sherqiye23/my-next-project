@@ -5,6 +5,7 @@ import { Toaster } from "react-hot-toast";
 import UserEmailContext from "@/context/UserEmailContext";
 import SessionProvider from '../components/SessionProvider'
 import { getServerSession } from "next-auth";
+import ReduxProvider from "@/lib/providers/ReduxProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -54,12 +55,14 @@ export default async function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <SessionProvider session={session}>
-          <UserEmailContext>
-            <Toaster position="top-center" />
-            {children}
-          </UserEmailContext>
-        </SessionProvider>
+        <ReduxProvider>
+          <SessionProvider session={session}>
+            <UserEmailContext>
+              <Toaster position="top-center" />
+              {children}
+            </UserEmailContext>
+          </SessionProvider>
+        </ReduxProvider>
       </body>
     </html>
   );

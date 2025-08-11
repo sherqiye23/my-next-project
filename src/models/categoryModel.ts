@@ -33,7 +33,7 @@ const categorySchema = new mongoose.Schema<ICategory>(
         },
         color: {
             type: String,
-            default: '#b3b3b3'
+            default: '#2563EB'
         }
     },
     { timestamps: { createdAt: true, updatedAt: false } }
