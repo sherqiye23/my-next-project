@@ -2,37 +2,21 @@ import mongoose, { Document } from "mongoose";
 
 export interface IReminderTime extends Document {
     title: string,
-    createdById: string,
-    categoryId: string,
-    todosArray: string[],
-    commentIdsArray: string[],
-    isPrivate: boolean,
+    time: Date,
+    isReminderSelected: boolean,
     isSoftDeleted: boolean,
 }
-// title, time, isSelected, isSoftDeleted, 
+
 const reminderTimeSchema = new mongoose.Schema<IReminderTime>(
     {
         title: {
             type: String,
             required: [true, 'Title is required'],
         },
-        createdById: {
-            type: String,
-            required: [true, 'CreatedById is required'],
+        time: {
+            type: Date
         },
-        categoryId: {
-            type: String,
-            required: [true, 'CategoryId is required'],
-        },
-        todosArray: {
-            type: [String],
-            default: []
-        },
-        commentIdsArray: {
-            type: [String],
-            default: []
-        },
-        isPrivate: {
+        isReminderSelected: {
             type: Boolean,
             default: false
         },

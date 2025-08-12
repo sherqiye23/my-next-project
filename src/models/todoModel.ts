@@ -1,41 +1,38 @@
 import mongoose, { Document } from "mongoose";
 
 export interface ITodo extends Document {
-    title: string,
-    createdById: string,
-    categoryId: string,
-    todosArray: string[],
-    commentIdsArray: string[],
-    isPrivate: boolean,
-    isSoftDeleted: boolean,
+    description: string,
+    todoListId: string,
+    isCompleted: boolean,
+    remiderTimes: string[],
+    isCustomReminderTime: boolean,
+    customReminderTime: string,
+    isSoftDeleted: boolean
 }
-// todoListId, description, isCompleted, remidertimes[], iscustomremindertime, customremindertime, isSoftDeleted
 
 const todoSchema = new mongoose.Schema<ITodo>(
     {
-        title: {
+        description: {
             type: String,
-            required: [true, 'Title is required'],
+            required: [true, 'Description is required'],
         },
-        createdById: {
+        todoListId: {
             type: String,
-            required: [true, 'CreatedById is required'],
+            required: [true, 'TodoListId is required'],
         },
-        categoryId: {
-            type: String,
-            required: [true, 'CategoryId is required'],
-        },
-        todosArray: {
-            type: [String],
-            default: []
-        },
-        commentIdsArray: {
-            type: [String],
-            default: []
-        },
-        isPrivate: {
+        isCompleted: {
             type: Boolean,
-            default: true
+            default: false
+        },
+        remiderTimes: {
+            type: [String],
+            default: []
+        },
+        isCustomReminderTime: {
+            type: Boolean
+        },
+        customReminderTime: {
+            type: String,
         },
         isSoftDeleted: {
             type: Boolean,
