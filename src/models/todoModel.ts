@@ -1,12 +1,12 @@
-import mongoose, { Document } from "mongoose";
+import mongoose, { Document, Types } from "mongoose";
 
 export interface ITodo extends Document {
-    description: string,
-    todoListId: string,
-    isCompleted: boolean,
-    remiderTimes: string[],
-    isCustomReminderTime: boolean,
-    customReminderTime: string,
+    description: string;
+    todoListId: Types.ObjectId;
+    isCompleted: boolean;
+    reminderTime: Types.ObjectId | null;
+    isCustomReminderTime: boolean;
+    customReminderTime: Date | null;
     isSoftDeleted: boolean
 }
 
@@ -17,22 +17,26 @@ const todoSchema = new mongoose.Schema<ITodo>(
             required: [true, 'Description is required'],
         },
         todoListId: {
-            type: String,
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'TodoList',
             required: [true, 'TodoListId is required'],
         },
         isCompleted: {
             type: Boolean,
             default: false
         },
-        remiderTimes: {
-            type: [String],
-            default: []
+        reminderTime: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'ReminderTime',
+            default: null
         },
         isCustomReminderTime: {
-            type: Boolean
+            type: Boolean,
+            default: false
         },
         customReminderTime: {
-            type: String,
+            type: Date,
+            default: null
         },
         isSoftDeleted: {
             type: Boolean,

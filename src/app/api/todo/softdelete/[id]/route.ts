@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import mongoose from 'mongoose';
-import TodoList from "@/models/todolistModel";
+import Todo from "@/models/todoModel";
 
 interface Context {
     params: Promise<{
@@ -15,20 +15,18 @@ export async function DELETE(
     try {
         const { id } = await context.params;
 
-        const todolistId = id;
-        const softdeletedTodoList = await TodoList.findOne({ _id: todolistId })
-        if (!softdeletedTodoList) {
-            return NextResponse.json({ message: "Todo List is not found" }, { status: 404 });
+        const todoId = id;
+        const softdeletedTodo = await Todo.findOne({ _id: todoId })
+        if (!softdeletedTodo) {
+            return NextResponse.json({ message: "Todo is not found" }, { status: 404 });
         }
-        if (softdeletedTodoList.isSoftDeleted) {
-            return NextResponse.json({ message: "Todo List already soft deleted" }, { status: 400 });
+        if (softdeletedTodo.isSoftDeleted) {
+            return NextResponse.json({ message: "Todo already soft deleted" }, { status: 400 });
         }
 
-        // user, category, favorites-de todolistId oldugu kimi qalacaq amma front terefde todolistleri gosterende softdelete olub olmadigini yoxlamalisan ki other yazasan
-
-        softdeletedTodoList.isSoftDeleted = true;
-        await softdeletedTodoList.save();
-        return NextResponse.json({ message: `Todo List soft deleted` }, { status: 200 });
+        softdeletedTodo.isSoftDeleted = true;
+        await softdeletedTodo.save();
+        return NextResponse.json({ message: `Todo soft deleted` }, { status: 200 });
 
     } catch (error: unknown) {
         if (error instanceof mongoose.Error.ValidationError) {

@@ -2,8 +2,8 @@ import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import mongoose from 'mongoose';
-import TodoList from "@/models/todolistModel";
 import Todo from "@/models/todoModel";
+import TodoList from "@/models/todolistModel";
 
 interface Context {
     params: Promise<{
@@ -43,18 +43,20 @@ export async function DELETE(
             return NextResponse.json({ message: "You are not admin" }, { status: 403 });
         }
 
-        const todolistId = id;
-        const deletedTodoList = await TodoList.findOne({ _id: todolistId })
-        if (!deletedTodoList) {
-            return NextResponse.json({ message: "Todo List is not found" }, { status: 404 });
+        const todoId = id;
+        const deletedTodo = await Todo.findOne({ _id: todoId })
+        if (!deletedTodo) {
+            return NextResponse.json({ message: "Todo is not found" }, { status: 404 });
         }
 
-        // user, category, favorites, comments -> bunlara baglidir deye silinme isi bunlardan da kececek
+        await Todo.findByIdAndDelete(todoId);
+        // todolistin icinde varsa ordan da silirik
+        await TodoList.updateOne(
+            { _id: deletedTodo.todoListId },
+            { $pull: { todosArray: todoId } }
+        );
 
-        await TodoList.findByIdAndDelete(todolistId);
-        // icindeki todolari da silirik
-        await Todo.deleteMany({ todoListId: todolistId });
-        return NextResponse.json({ message: `Todo List deleted` }, { status: 200 });
+        return NextResponse.json({ message: `Todo deleted` }, { status: 200 });
     } catch (error: unknown) {
         if (error instanceof mongoose.Error.ValidationError) {
             const errors = Object.values(error.errors).map(el => {

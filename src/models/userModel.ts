@@ -1,4 +1,4 @@
-import mongoose, { Document } from "mongoose";
+import mongoose, { Document, Types } from "mongoose";
 
 export interface IUser extends Document {
     username: string,
@@ -6,7 +6,7 @@ export interface IUser extends Document {
     password: string,
     isAdmin: boolean,
     profileImg: string,
-    favoritesId: string,
+    favoritesId: Types.ObjectId,
     todoListIds: string[],
     chatIds: string[],
 }
@@ -42,7 +42,8 @@ const userSchema = new mongoose.Schema<IUser>(
             default: "v1753739717/vcw9wjll2wphh2btpkym.jpg"
         },
         favoritesId: {
-            type: String
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Favorites',
         },
         todoListIds: {
             type: [String],

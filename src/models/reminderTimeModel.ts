@@ -3,7 +3,6 @@ import mongoose, { Document } from "mongoose";
 export interface IReminderTime extends Document {
     title: string,
     time: Date,
-    isReminderSelected: boolean,
     isSoftDeleted: boolean,
 }
 
@@ -12,13 +11,12 @@ const reminderTimeSchema = new mongoose.Schema<IReminderTime>(
         title: {
             type: String,
             required: [true, 'Title is required'],
+            unique: true
         },
         time: {
-            type: Date
-        },
-        isReminderSelected: {
-            type: Boolean,
-            default: false
+            type: Date,
+            required: [true, 'Time is required'],
+            unique: true
         },
         isSoftDeleted: {
             type: Boolean,

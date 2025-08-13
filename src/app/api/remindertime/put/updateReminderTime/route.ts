@@ -1,59 +1,70 @@
-import Category from "@/models/categoryModel";
 import { NextRequest, NextResponse } from "next/server";
 import mongoose from 'mongoose';
+import ReminderTime from "@/models/reminderTimeModel";
 
 export async function PUT(request: NextRequest) {
     try {
         const reqBody = await request.json()
-        const { userId, name, categoryId, color } = reqBody
+        const { reminderId, title, time } = reqBody
 
-        const trimmedName = name.trim();
-
-        if (!trimmedName) {
+        if (!title.trim()) {
             return NextResponse.json({
-                message: 'Name is required',
+                message: 'Title is required',
                 success: false
             }, { status: 400 });
         }
-        if (trimmedName.length > 20) {
+        if (title.trim().length > 15) {
             return NextResponse.json({
-                message: 'Name maximum 20 characters',
+                message: 'Title maximum 15 characters',
+                success: false
+            }, { status: 400 });
+        }
+        if (!time) {
+            return NextResponse.json({
+                message: 'Time is required',
                 success: false
             }, { status: 400 });
         }
 
-        const findedCategory = await Category.findById(categoryId);
-        if (!findedCategory) {
+        const findReminder = await ReminderTime.findById(reminderId)
+        if (!findReminder) {
             return NextResponse.json({
-                message: 'Category is not found',
+                message: "Reminder Time not found",
                 success: false
             }, { status: 404 });
         }
-
-        if (findedCategory.isSoftDeleted) {
+        if (findReminder.isSoftDeleted) {
             return NextResponse.json({
-                message: 'Category is soft deleted',
+                message: 'Reminder Time is soft deleted',
                 success: false
             }, { status: 400 });
         }
 
-        const existing = await Category.findOne({ name: trimmedName, createdById: userId });
-        if (existing && existing._id.toString() !== categoryId) {
+        const existingTitle = await ReminderTime.findOne({ title: title.trim() })
+        const existingTime = await ReminderTime.findOne({ time })
+        if (existingTitle) {
             return NextResponse.json({
-                message: "This name already exists",
+                message: "This title already exists",
+                success: false
+            }, { status: 400 });
+        }
+        if (existingTime) {
+            return NextResponse.json({
+                message: "This time already exists",
                 success: false
             }, { status: 400 });
         }
 
-        await Category.findByIdAndUpdate(categoryId, {
-            name: trimmedName,
-            ...(color && { color })
-        });
+        const updateReminderTime = await ReminderTime.findByIdAndUpdate(reminderId, {
+            title: title,
+            time
+        }, { new: true })
 
         return NextResponse.json({
-            message: 'Category updated successfully!',
-            success: true
-        });
+            message: 'Reminder Time updated successfully!',
+            success: true,
+            updateReminderTime
+        })
 
     } catch (error: unknown) {
         if (error instanceof mongoose.Error.ValidationError) {

@@ -1,10 +1,10 @@
-import mongoose, { Document } from "mongoose";
+import mongoose, { Document, Types } from "mongoose";
 
 export interface ITodoList extends Document {
     title: string,
-    createdById: string,
-    categoryId: string,
-    todosArray: string[],
+    createdById: Types.ObjectId,
+    categoryId: Types.ObjectId,
+    todosArray: Types.ObjectId[],
     commentIdsArray: string[],
     isReported: boolean,
     isPrivate: boolean,
@@ -18,15 +18,18 @@ const todolistSchema = new mongoose.Schema<ITodoList>(
             required: [true, 'Title is required'],
         },
         createdById: {
-            type: String,
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User',
             required: [true, 'CreatedById is required'],
         },
         categoryId: {
-            type: String,
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Category',
             required: [true, 'CategoryId is required'],
         },
         todosArray: {
-            type: [String],
+            type: [mongoose.Schema.Types.ObjectId],
+            ref: 'Todo',
             default: []
         },
         commentIdsArray: {

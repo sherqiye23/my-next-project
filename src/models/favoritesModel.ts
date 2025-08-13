@@ -1,7 +1,7 @@
-import mongoose, { Document } from "mongoose";
+import mongoose, { Document, Types } from "mongoose";
 
 export interface IFavorites extends Document {
-    userId: string,
+    userId: Types.ObjectId,
     todoListIds: string[],
     createdAt: Date
 }
@@ -9,7 +9,8 @@ export interface IFavorites extends Document {
 const favoritesSchema = new mongoose.Schema<IFavorites>(
     {
         userId: {
-            type: String,
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User',
             unique: true,
         },
         todoListIds: {

@@ -1,9 +1,8 @@
 import { cookies } from "next/headers";
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import mongoose from 'mongoose';
 import TodoList from "@/models/todolistModel";
-
 
 const SECRET = process.env.JWT_SECRET!;
 interface MyJwtPayload extends JwtPayload {

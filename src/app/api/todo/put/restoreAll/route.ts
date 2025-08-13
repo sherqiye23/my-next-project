@@ -1,15 +1,8 @@
 import { cookies } from "next/headers";
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import mongoose from 'mongoose';
-import TodoList from "@/models/todolistModel";
 import Todo from "@/models/todoModel";
-
-interface Context {
-    params: Promise<{
-        id: string;
-    }>;
-}
 
 const SECRET = process.env.JWT_SECRET!;
 interface MyJwtPayload extends JwtPayload {
@@ -18,13 +11,8 @@ interface MyJwtPayload extends JwtPayload {
     isAdmin: boolean;
 }
 
-export async function DELETE(
-    request: NextRequest,
-    context: Context
-) {
+export async function PUT() {
     try {
-        const { id } = await context.params;
-
         const cookieStore = await cookies();
         const token = cookieStore.get("accessToken")?.value;
 
@@ -43,18 +31,17 @@ export async function DELETE(
             return NextResponse.json({ message: "You are not admin" }, { status: 403 });
         }
 
-        const todolistId = id;
-        const deletedTodoList = await TodoList.findOne({ _id: todolistId })
-        if (!deletedTodoList) {
-            return NextResponse.json({ message: "Todo List is not found" }, { status: 404 });
+        const restoreTodo = await Todo.find({ isSoftDeleted: true })
+        if (!restoreTodo || restoreTodo.length === 0) {
+            return NextResponse.json({ message: "No soft deleted todo found" }, { status: 404 });
         }
 
-        // user, category, favorites, comments -> bunlara baglidir deye silinme isi bunlardan da kececek
+        const result = await Todo.updateMany(
+            { isSoftDeleted: true },
+            { $set: { isSoftDeleted: false } }
+        );
+        return NextResponse.json({ message: `${result.modifiedCount} todo restored` }, { status: 200 });
 
-        await TodoList.findByIdAndDelete(todolistId);
-        // icindeki todolari da silirik
-        await Todo.deleteMany({ todoListId: todolistId });
-        return NextResponse.json({ message: `Todo List deleted` }, { status: 200 });
     } catch (error: unknown) {
         if (error instanceof mongoose.Error.ValidationError) {
             const errors = Object.values(error.errors).map(el => {
@@ -71,5 +58,3 @@ export async function DELETE(
         }
     }
 }
-
-

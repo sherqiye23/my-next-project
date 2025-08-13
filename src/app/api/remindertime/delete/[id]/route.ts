@@ -2,7 +2,7 @@ import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import mongoose from 'mongoose';
-import TodoList from "@/models/todolistModel";
+import ReminderTime from "@/models/reminderTimeModel";
 import Todo from "@/models/todoModel";
 
 interface Context {
@@ -43,18 +43,25 @@ export async function DELETE(
             return NextResponse.json({ message: "You are not admin" }, { status: 403 });
         }
 
-        const todolistId = id;
-        const deletedTodoList = await TodoList.findOne({ _id: todolistId })
-        if (!deletedTodoList) {
-            return NextResponse.json({ message: "Todo List is not found" }, { status: 404 });
+        const reminderTimeId = id;
+        const deletedReminderTime = await ReminderTime.findOne({ _id: reminderTimeId })
+        if (!deletedReminderTime) {
+            return NextResponse.json({ message: "Reminder time is not found" }, { status: 404 });
         }
 
-        // user, category, favorites, comments -> bunlara baglidir deye silinme isi bunlardan da kececek
+        await Todo.updateMany(
+            { reminderTime: reminderTimeId },
+            {
+                $set: {
+                    reminderTime: null,
+                    isCustomReminderTime: true,
+                    customReminderTime: deletedReminderTime.time
+                }
+            }
+        );
 
-        await TodoList.findByIdAndDelete(todolistId);
-        // icindeki todolari da silirik
-        await Todo.deleteMany({ todoListId: todolistId });
-        return NextResponse.json({ message: `Todo List deleted` }, { status: 200 });
+        await ReminderTime.findByIdAndDelete(reminderTimeId);
+        return NextResponse.json({ message: `Reminder time deleted` }, { status: 200 });
     } catch (error: unknown) {
         if (error instanceof mongoose.Error.ValidationError) {
             const errors = Object.values(error.errors).map(el => {

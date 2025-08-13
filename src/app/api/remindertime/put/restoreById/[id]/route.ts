@@ -2,7 +2,7 @@ import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import mongoose from 'mongoose';
-import TodoList from "@/models/todolistModel";
+import ReminderTime from "@/models/reminderTimeModel";
 import Todo from "@/models/todoModel";
 
 interface Context {
@@ -18,7 +18,7 @@ interface MyJwtPayload extends JwtPayload {
     isAdmin: boolean;
 }
 
-export async function DELETE(
+export async function PUT(
     request: NextRequest,
     context: Context
 ) {
@@ -43,18 +43,30 @@ export async function DELETE(
             return NextResponse.json({ message: "You are not admin" }, { status: 403 });
         }
 
-        const todolistId = id;
-        const deletedTodoList = await TodoList.findOne({ _id: todolistId })
-        if (!deletedTodoList) {
-            return NextResponse.json({ message: "Todo List is not found" }, { status: 404 });
+        const reminderTimeId = id;
+        const restoreReminderTime = await ReminderTime.findOne({ _id: reminderTimeId })
+        if (!restoreReminderTime) {
+            return NextResponse.json({ message: "Reminder time is not found" }, { status: 404 });
+        }
+        if (!restoreReminderTime.isSoftDeleted) {
+            return NextResponse.json({ message: "Reminder time already restored" }, { status: 400 });
         }
 
-        // user, category, favorites, comments -> bunlara baglidir deye silinme isi bunlardan da kececek
+        await Todo.updateMany(
+            { customReminderTime: restoreReminderTime.time, isCustomReminderTime: true },
+            {
+                $set: {
+                    reminderTime: restoreReminderTime._id,
+                    isCustomReminderTime: false,
+                    customReminderTime: null
+                }
+            }
+        );
 
-        await TodoList.findByIdAndDelete(todolistId);
-        // icindeki todolari da silirik
-        await Todo.deleteMany({ todoListId: todolistId });
-        return NextResponse.json({ message: `Todo List deleted` }, { status: 200 });
+        restoreReminderTime.isSoftDeleted = false;
+        await restoreReminderTime.save();
+        return NextResponse.json({ message: `Reminder time restored` }, { status: 200 });
+
     } catch (error: unknown) {
         if (error instanceof mongoose.Error.ValidationError) {
             const errors = Object.values(error.errors).map(el => {
@@ -71,5 +83,3 @@ export async function DELETE(
         }
     }
 }
-
-
