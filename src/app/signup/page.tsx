@@ -23,7 +23,8 @@ const SignUpPage = () => {
         username: '',
         email: '',
         password: '',
-        profileImg: null
+        profileImg: null,
+        bannerImg: null,
     })
     const [resendTime, setResendTime] = useState<number>(30)
     const [otpActivityTime, setOtpActivityTime] = useState<number>(5 * 60)
@@ -37,6 +38,11 @@ const SignUpPage = () => {
                 formData.append("profileImg", '');
             } else {
                 formData.append("profileImg", user.profileImg);
+            }
+            if (!user?.bannerImg) {
+                formData.append("bannerImg", '');
+            } else {
+                formData.append("bannerImg", user.bannerImg);
             }
 
             formData.append("otp", String(values.otpCode));

@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import mongoose from 'mongoose';
 import TodoList from "@/models/todolistModel";
+import Category from "@/models/categoryModel";
+import User from "@/models/userModel";
 
 export async function POST(request: NextRequest) {
     try {
@@ -28,6 +30,13 @@ export async function POST(request: NextRequest) {
         })
 
         const savedTodoList = await newTodoList.save()
+
+        await Category.findByIdAndUpdate(categoryId, {
+            $push: { todoListIds: savedTodoList._id }
+        });
+        await User.findByIdAndUpdate(userId, {
+            $push: { todoListIds: savedTodoList._id }
+        });
 
         return NextResponse.json({
             message: 'Todo List created successfully!',

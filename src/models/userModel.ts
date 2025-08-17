@@ -6,6 +6,7 @@ export interface IUser extends Document {
     password: string,
     isAdmin: boolean,
     profileImg: string,
+    bannerImg: string,
     favoritesId: Types.ObjectId,
     todoListIds: string[],
     chatIds: string[],
@@ -40,6 +41,10 @@ const userSchema = new mongoose.Schema<IUser>(
         profileImg: {
             type: String,
             default: "v1753739717/vcw9wjll2wphh2btpkym.jpg"
+        },
+        bannerImg: {
+            type: String,
+            default: "v1755469597/default-banner_pkbtz3.jpg"
         },
         favoritesId: {
             type: mongoose.Schema.Types.ObjectId,

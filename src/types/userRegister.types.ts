@@ -6,7 +6,8 @@ export interface UserRegisterFront {
     email: string;
     password: string;
     username: string;
-    profileImg: File | null
+    profileImg: File | null;
+    bannerImg: File | null;
 }
 
 export type UserRegisterContextType = {

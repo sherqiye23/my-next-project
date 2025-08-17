@@ -10,7 +10,7 @@ const Navbar = () => {
   const route = useRouter()
 
   return (
-    <div className='fixed w-full p-2 backdrop-blur-sm bg-base-100/50 border-b-[1px] border-b-[var(--component-bg)]'>
+    <div className='fixed w-full p-2 backdrop-blur-sm bg-base-100/50 border-b-[1px] border-b-[var(--component-bg)] z-10'>
       <div className='mx-auto my-0 max-w-[1350px] flex items-center justify-between'>
         {/* logo */}
         <div className="container flex justify-between">

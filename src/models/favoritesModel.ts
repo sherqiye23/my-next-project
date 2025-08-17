@@ -3,7 +3,6 @@ import mongoose, { Document, Types } from "mongoose";
 export interface IFavorites extends Document {
     userId: Types.ObjectId,
     todoListIds: string[],
-    createdAt: Date
 }
 
 const favoritesSchema = new mongoose.Schema<IFavorites>(

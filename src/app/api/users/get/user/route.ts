@@ -29,7 +29,8 @@ export async function GET(request: NextRequest) {
                 username: user.username,
                 email: user.email,
                 isAdmin: user.isAdmin,
-                profileImg: user.profileImg
+                profileImg: user.profileImg,
+                bannerImg: user.bannerImg,
             });
         }
 
@@ -61,7 +62,8 @@ export async function GET(request: NextRequest) {
             username: user.username,
             email: user.email,
             isAdmin: user.isAdmin,
-            profileImg: user.profileImg
+            profileImg: user.profileImg,
+            bannerImg: user.bannerImg,
         });
     } catch (error: unknown) {
         if (error instanceof mongoose.Error.ValidationError) {

@@ -22,6 +22,7 @@ export async function POST(request: NextRequest) {
     try {
         const formData = await request.formData();
         const profileImg = formData.get("profileImg");
+        const bannerImg = formData.get("bannerImg");
         const email = formData.get("email");
         const username = formData.get("username");
         const password = formData.get("password");
@@ -38,6 +39,7 @@ export async function POST(request: NextRequest) {
         cache.delete(email);
 
         // image upload cloudinary
+        // profile image
         let sendProfileImg;
         if (profileImg instanceof File) {
             const arrayBuffer = await profileImg.arrayBuffer();
@@ -72,6 +74,41 @@ export async function POST(request: NextRequest) {
                 success: false,
             }, { status: 400 });
         }
+        // banner image
+        let sendBannerImg;
+        if (bannerImg instanceof File) {
+            const arrayBuffer = await bannerImg.arrayBuffer();
+            const buffer = Buffer.from(arrayBuffer);
+
+            const result: CloudinaryResultType = await new Promise((resolve, reject) => {
+                const uploadStream = cloudinary.uploader.upload_stream(
+                    { folder: 'banner-images' },
+                    (error, uploadResult) => {
+                        if (error) {
+                            return reject(error);
+                        }
+                        resolve(uploadResult as CloudinaryResultType);
+                    }
+                );
+                uploadStream.end(buffer);
+            });
+            const fullImageUrl = result.secure_url;
+            const uploadIndex = fullImageUrl.indexOf("/upload/");
+            let shortImageUrl = fullImageUrl;
+
+            if (uploadIndex !== -1) {
+                shortImageUrl = fullImageUrl.substring(uploadIndex + "/upload/".length);
+            }
+            sendBannerImg = shortImageUrl
+
+        } else if (bannerImg === '') {
+            sendBannerImg = null
+        } else {
+            return NextResponse.json({
+                message: "Invalid banner picture format",
+                success: false,
+            }, { status: 400 });
+        }
 
         // hash password if the user follows all the rules
         const salt = await bcryptjs.genSalt(10)
@@ -82,6 +119,7 @@ export async function POST(request: NextRequest) {
             email,
             password: hashedPassword,
             ...(sendProfileImg && { profileImg: sendProfileImg }),
+            ...(sendBannerImg && { bannerImg: sendBannerImg }),
         });
         const savedUser = await newUser.save()
 

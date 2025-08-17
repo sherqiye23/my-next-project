@@ -8,6 +8,7 @@ import { LuEye, LuEyeClosed, LuLogIn, LuUserPlus } from "react-icons/lu";
 import { GoPencil } from "react-icons/go";
 import { UserRegisterFront } from '@/types/userRegister.types';
 import { signIn } from 'next-auth/react';
+import { cloudinaryUrl } from '@/lib/urls';
 
 type Props = {
     setPage: React.Dispatch<React.SetStateAction<boolean>>;
@@ -24,9 +25,10 @@ interface ErrorResponseData {
 export default function SignupPage({ setUser, setPage, setResendTime, setOtpActivityTime }: Props) {
     const [loading, setLoading] = useState<boolean>(false)
     const [showPassword, setShowPassword] = useState(false);
-    const [file, setFile] = useState<File | null>(null);
     const [imageUrl, setImageUrl] = useState<string>("");
+    const [bannerImageUrl, setBannerImageUrl] = useState<string>("");
     const inputRef = useRef<HTMLInputElement>(null);
+    const bannerInputRef = useRef<HTMLInputElement>(null);
 
     //formik yup
     interface SignInfo {
@@ -34,12 +36,14 @@ export default function SignupPage({ setUser, setPage, setResendTime, setOtpActi
         email: string,
         password: string,
         profileImg: File | null,
+        bannerImg: File | null,
     }
     const initialValues: SignInfo = {
         username: '',
         email: '',
         password: '',
         profileImg: null,
+        bannerImg: null,
     };
     const validationSchema = Yup.object({
         username: Yup.string().trim().required('Username is required').max(30, "max 30 characters"),
@@ -101,32 +105,62 @@ export default function SignupPage({ setUser, setPage, setResendTime, setOtpActi
                             </div>
                         </div>
 
-                        <div className="flex items-center justify-center">
-                            <div
-                                className="w-[50px] h-[50px] rounded-full hover:opacity-60 flex items-center justify-center text-gray-600 text-xl text-center transition-all duration-200 ease-in cursor-pointer"
-                                style={{
-                                    backgroundSize: "cover",
-                                    backgroundPosition: "center",
-                                    backgroundImage: `url(${imageUrl ? imageUrl : 'https://res.cloudinary.com/dz92kapni/image/upload/v1753739717/vcw9wjll2wphh2btpkym.jpg'})`,
-                                }}
-                                onClick={() => inputRef.current?.click()}
-                            >
-                                {(<GoPencil className="cursor-pointer" />)}
-                                <input
-                                    type="file"
-                                    name="profileImg"
-                                    ref={inputRef}
-                                    accept="image/*"
-                                    style={{ display: "none" }}
-                                    onChange={(e) => {
-                                        const selectedFile = e.target.files?.[0];
-                                        if (selectedFile) {
-                                            setFile(selectedFile);
-                                            setImageUrl(URL.createObjectURL(selectedFile));
-                                            setFieldValue("profileImg", selectedFile);
-                                        }
+                        <div className="flex items-center justify-center gap-3">
+                            <div>
+                                <span>Profile:</span>
+                                <div
+                                    className="w-[50px] h-[50px] rounded-full hover:opacity-60 flex items-center justify-center text-gray-600 text-xl text-center transition-all duration-200 ease-in cursor-pointer"
+                                    style={{
+                                        backgroundSize: "cover",
+                                        backgroundPosition: "center",
+                                        backgroundImage: `url(${imageUrl ? imageUrl : cloudinaryUrl + 'v1753739717/vcw9wjll2wphh2btpkym.jpg'})`,
                                     }}
-                                />
+                                    onClick={() => inputRef.current?.click()}
+                                >
+                                    {(<GoPencil className="cursor-pointer" />)}
+                                    <input
+                                        type="file"
+                                        name="profileImg"
+                                        ref={inputRef}
+                                        accept="image/*"
+                                        style={{ display: "none" }}
+                                        onChange={(e) => {
+                                            const selectedFile = e.target.files?.[0];
+                                            if (selectedFile) {
+                                                setImageUrl(URL.createObjectURL(selectedFile));
+                                                setFieldValue("profileImg", selectedFile);
+                                            }
+                                        }}
+                                    />
+                                </div>
+                            </div>
+                            <div>
+                                <span>Banner:</span>
+                                <div
+                                    className="w-[100px] h-[50px] rounded hover:opacity-60 flex items-center justify-center text-gray-600 text-xl text-center transition-all duration-200 ease-in cursor-pointer"
+                                    style={{
+                                        backgroundSize: "cover",
+                                        backgroundPosition: "center",
+                                        backgroundImage: `url(${bannerImageUrl ? bannerImageUrl : cloudinaryUrl + 'v1755469597/default-banner_pkbtz3.jpg'})`,
+                                    }}
+                                    onClick={() => bannerInputRef.current?.click()}
+                                >
+                                    {(<GoPencil className="cursor-pointer" />)}
+                                    <input
+                                        type="file"
+                                        name="bannerImg"
+                                        ref={bannerInputRef}
+                                        accept="image/*"
+                                        style={{ display: "none" }}
+                                        onChange={(e) => {
+                                            const selectedFile = e.target.files?.[0];
+                                            if (selectedFile) {
+                                                setBannerImageUrl(URL.createObjectURL(selectedFile));
+                                                setFieldValue("bannerImg", selectedFile);
+                                            }
+                                        }}
+                                    />
+                                </div>
                             </div>
                         </div>
 

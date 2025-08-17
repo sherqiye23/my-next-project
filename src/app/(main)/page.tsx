@@ -5,9 +5,25 @@ import '../globals.css'
 import { useGetAllCategoryQuery } from "@/lib/slices/categorySlice";
 import { useMyContext } from "@/context/UserEmailContext";
 import { cloudinaryUrl } from "@/lib/urls";
+import { useRouter } from "next/navigation";
+import { useSession, signOut as nextAuthSignOut } from "next-auth/react";
+import axios, { AxiosError } from "axios";
+import toast from "react-hot-toast";
+
+interface ErrorResponseData {
+  message?: string;
+  error?: string;
+}
+interface FakeCategory {
+  name: string,
+  color: string
+}
 
 export default function Home() {
   const { userInfo, setUserInfo, isLoading } = useMyContext()
+  const { data: session } = useSession();
+  const route = useRouter()
+
   const { data, isLoading: categoryLoading, isError, error } = useGetAllCategoryQuery()
   useEffect(() => {
     if (isError) {
@@ -18,10 +34,7 @@ export default function Home() {
   const getTodoListsByCategory = (id: number) => {
     setActiveCategory(id);
   }
-  interface FakeCategory {
-    name: string,
-    color: string
-  }
+
   const fakeCate: FakeCategory[] = [
     {
       name: 'All',
@@ -56,6 +69,24 @@ export default function Home() {
       color: '#2563EB'
     }
   ]
+  const logOutFunction = async () => {
+    if (session) {
+      await nextAuthSignOut();
+    } else {
+      try {
+        const response = await axios.post('/api/users/post/logout', {})
+        setUserInfo(null)
+        toast.success(response.data.message)
+      } catch (error) {
+        const err = error as AxiosError;
+        console.log('Logout failed: ', err);
+        const data = err.response?.data as ErrorResponseData;
+        const message = data?.message || data?.error || err.message;
+        toast.error(message || 'Something went wrong');
+      }
+    }
+    route.push('/');
+  }
 
   return (
     <div className="h-[170vh]">
@@ -63,8 +94,10 @@ export default function Home() {
         isLoading ? (
           <span className="loading loading-spinner text-[#FD6406] fixed top-[50%] left-[50%] "></span>
         ) : (
-          <div className="grid grid-cols-[1fr_3fr_1fr] gap-2">
-            <div className="w-full bg-[var(--component-bg)] h-[50vh] rounded-xl p-5">a</div>
+          <div className="grid grid-cols-[1fr_4fr_1fr] gap-2">
+            <div className="w-full bg-[var(--component-bg)] h-[50vh] rounded-xl p-5">
+              <button className="px-3 py-1 rounded-xl bg-red-500 text-white cursor-pointer" onClick={() => logOutFunction()}>LogOut</button>
+            </div>
             <div className="w-full flex flex-col gap-2">
               <div>
                 <input type="search" name="search" id="search" placeholder="Search todo list"
@@ -78,7 +111,7 @@ export default function Home() {
 
                       <div className="flex items-center gap-3 justify-between">
                         <div className="flex items-center gap-2">
-                          <div className="w-[25px] rounded-full">
+                          <div className="w-[25px] h-[25px] rounded-full">
                             <img src={cloudinaryUrl + userInfo?.profileImg} alt="profile" className="w-full h-full rounded-full object-cover" />
                           </div>
                           <span>{userInfo?.username}</span>
@@ -106,11 +139,11 @@ export default function Home() {
                         borderColor: category.color,
                       }}>
                       See all comments
-                      <span className="absolute h-[13px] w-[2px] bottom-full left-full"
+                      <span className="absolute h-[13px] w-[1px] bottom-full left-full"
                         style={{
                           backgroundColor: category.color
                         }}></span>
-                      <span className="absolute h-[13px] w-[2px] bottom-full right-full"
+                      <span className="absolute h-[13px] w-[1px] bottom-full right-full"
                         style={{
                           backgroundColor: category.color
                         }}></span>
@@ -146,6 +179,14 @@ export default function Home() {
                           </div>
                         ))
                       }
+                      <div className={`p-2 rounded-xl cursor-pointer ${activeCategory == -1 ? `font-semibold` : ''}`}
+                        style={{
+                          backgroundColor: activeCategory == -1 ? `#87CEEB20` : '',
+                          color: activeCategory == -1 ? `#87CEEB` : '',
+                        }}
+                        onClick={() => getTodoListsByCategory(-1)}>
+                        Other
+                      </div>
                     </div>
                   )
                 }
