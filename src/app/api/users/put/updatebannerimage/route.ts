@@ -8,13 +8,24 @@ type CloudinaryResultType = {
     public_id: string;
 };
 
-const DEFAULT_IMAGE = "v1753739717/vcw9wjll2wphh2btpkym.jpg";
 const DEFAULT_BANNER = "v1755469597/default-banner_pkbtz3.jpg";
-
+export const config = {
+    api: {
+        bodyParser: false,
+    },
+};
 export async function PUT(request: NextRequest) {
     try {
-        const reqBody = await request.json()
-        const { username, profileImg, bannerImg, userId } = reqBody
+        const formData = await request.formData();
+        const bannerImg = formData.get("bannerImg");
+        const userId = formData.get("userId");
+
+        if (!userId) {
+            return NextResponse.json({
+                message: "User id not found",
+                success: false
+            }, { status: 404 });
+        }
 
         const userFind = await User.findOne({ _id: userId });
         if (!userFind) {
@@ -24,70 +35,7 @@ export async function PUT(request: NextRequest) {
             }, { status: 404 });
         }
 
-        const trimmedName = username.trim();
-        if (!trimmedName) {
-            return NextResponse.json({
-                message: 'Username is required',
-                success: false
-            }, { status: 400 });
-        }
-        if (trimmedName.length > 30) {
-            return NextResponse.json({
-                message: 'Username maximum 30 characters',
-                success: false
-            }, { status: 400 });
-        }
-
-        const existing = await User.findOne({ username: trimmedName, _id: { $ne: userId } });
-        if (existing) {
-            return NextResponse.json({
-                message: "This username exists",
-                success: false
-            }, { status: 400 });
-        }
-
         // image upload cloudinary
-        // profile img
-        let sendProfileImg = userFind.profileImg
-        if (profileImg instanceof File) {
-            const oldProfileImgUrlPart = userFind.profileImg;
-            if (oldProfileImgUrlPart && oldProfileImgUrlPart !== DEFAULT_IMAGE) {
-                try {
-                    const publicIdWithVersion = oldProfileImgUrlPart.substring(0, oldProfileImgUrlPart.lastIndexOf('.'));
-                    await cloudinary.uploader.destroy(publicIdWithVersion);
-                    console.log('Old profile image deleted');
-                } catch (error) {
-                    console.error('Deleted Error:', error);
-                }
-            }
-
-            const arrayBuffer = await profileImg.arrayBuffer();
-            const buffer = Buffer.from(arrayBuffer);
-
-            const result: CloudinaryResultType = await new Promise((resolve, reject) => {
-                const uploadStream = cloudinary.uploader.upload_stream(
-                    { folder: 'profile-images' },
-                    (error, uploadResult) => {
-                        if (error) {
-                            return reject(error);
-                        }
-                        resolve(uploadResult as CloudinaryResultType);
-                    }
-                );
-                uploadStream.end(buffer);
-            });
-            const fullImageUrl = result.secure_url;
-            const uploadIndex = fullImageUrl.indexOf("/upload/");
-            let shortImageUrl = fullImageUrl;
-
-            if (uploadIndex !== -1) {
-                shortImageUrl = fullImageUrl.substring(uploadIndex + "/upload/".length);
-            }
-            sendProfileImg = shortImageUrl
-
-        } else if (profileImg === '') {
-            sendProfileImg = DEFAULT_IMAGE
-        }
         // banner img
         let sendBannerImg = userFind.bannerImg
         if (bannerImg instanceof File) {
@@ -130,16 +78,13 @@ export async function PUT(request: NextRequest) {
             sendBannerImg = DEFAULT_BANNER
         }
 
-        await User.findByIdAndUpdate(userId, {
-            username: trimmedName,
-            profileImg: sendProfileImg,
-            bannerImg: sendBannerImg,
-        });
+        const updatedBanner = await User.findByIdAndUpdate(
+            userId,
+            { bannerImg: sendBannerImg },
+            { new: true }
+        );
 
-        return NextResponse.json({
-            message: 'User info updated',
-            success: true
-        });
+        return NextResponse.json(updatedBanner, { status: 200 });
 
     } catch (error: unknown) {
         if (error instanceof mongoose.Error.ValidationError) {

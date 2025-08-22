@@ -10,10 +10,17 @@ export async function POST(request: NextRequest) {
         const reqBody = await request.json()
         const { todoListId, userFavoriteId } = reqBody
 
-        const favorite = await Favorites.findOne({ _id: userFavoriteId })
+        const favorite = await Favorites.findById(userFavoriteId);
 
         if (!favorite) {
             return NextResponse.json({ error: "Favorite not found" }, { status: 404 });
+        }
+
+        if ((favorite.todoListIds as string[]).some(id => id.toString() === todoListId)) {
+            return NextResponse.json(
+                { message: "TodoList already in favorites" },
+                { status: 200 }
+            );
         }
 
         favorite.todoListIds.push(todoListId);

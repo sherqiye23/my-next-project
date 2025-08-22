@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { IoMoonOutline, IoSunny } from "react-icons/io5";
 
 export default function ThemeButton() {
     const [theme, setTheme] = useState<'light' | 'dark'>('light')
@@ -26,10 +27,11 @@ export default function ThemeButton() {
     return (
         <button
             onClick={toggleTheme}
-            className="btn btn-ghost"
+            title="theme"
+            className="cursor-pointer text-xl rounded-full p-1 hover:bg-[var(--component-bg)]/50"
             aria-label="Toggle theme"
         >
-            {theme === 'light' ? '🌙' : '☀️'}
+            {theme === 'light' ? <IoMoonOutline /> : <IoSunny />}
         </button>
     )
 }

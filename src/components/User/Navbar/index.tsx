@@ -10,7 +10,7 @@ const Navbar = () => {
   const route = useRouter()
 
   return (
-    <div className='fixed w-full p-2 backdrop-blur-sm bg-base-100/50 border-b-[1px] border-b-[var(--component-bg)] z-10'>
+    <div className='fixed w-full p-2 backdrop-blur-sm bg-base-100/50 border-b-[1px] border-b-[var(--component-bg)]/50 z-10'>
       <div className='mx-auto my-0 max-w-[1350px] flex items-center justify-between'>
         {/* logo */}
         <div className="container flex justify-between">
@@ -24,11 +24,11 @@ const Navbar = () => {
           </div>
         </div>
         {/* buttons */}
-        <div className='flex items-center justify-center gap-2 text-2xl'>
-          <div className='cursor-pointer' title='notification'>
+        <div className='flex items-center justify-center text-2xl'>
+          <div className='cursor-pointer rounded-full p-1 hover:bg-[var(--component-bg)]/50' title='notification'>
             <IoNotificationsOutline />
           </div>
-          <div onClick={() => route.push('/chat')} className='cursor-pointer' title='chat'>
+          <div onClick={() => route.push('/chat')} className='cursor-pointer rounded-full p-1 hover:bg-[var(--component-bg)]/50' title='chat'>
             <IoChatbubblesOutline />
           </div>
           <div>

@@ -24,14 +24,7 @@ export async function GET(request: NextRequest) {
             if (!user) {
                 return NextResponse.json({ error: "User not found" }, { status: 404 });
             }
-            return NextResponse.json({
-                id: user._id,
-                username: user.username,
-                email: user.email,
-                isAdmin: user.isAdmin,
-                profileImg: user.profileImg,
-                bannerImg: user.bannerImg,
-            });
+            return NextResponse.json(user);
         }
 
         // token control
@@ -57,14 +50,7 @@ export async function GET(request: NextRequest) {
         }
 
         // success and response userinfo
-        return NextResponse.json({
-            id: user._id,
-            username: user.username,
-            email: user.email,
-            isAdmin: user.isAdmin,
-            profileImg: user.profileImg,
-            bannerImg: user.bannerImg,
-        });
+        return NextResponse.json(user);
     } catch (error: unknown) {
         if (error instanceof mongoose.Error.ValidationError) {
             const errors = Object.values(error.errors).map(el => {

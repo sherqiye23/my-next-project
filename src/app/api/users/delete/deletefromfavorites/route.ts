@@ -16,7 +16,14 @@ export async function DELETE(request: NextRequest) {
             return NextResponse.json({ error: "Favorite not found" }, { status: 404 });
         }
 
-        favorite.todoListIds = (favorite.todoListIds as string[]).filter(id => id !== todoListId);
+        if (!favorite.todoListIds.includes(todoListId)) {
+            return NextResponse.json(
+                { message: "TodoList not found in favorites" },
+                { status: 404 }
+            );
+        }
+
+        favorite.todoListIds = (favorite.todoListIds as string[]).filter(id => id.toString() !== todoListId);
         await favorite.save();
 
         return NextResponse.json(

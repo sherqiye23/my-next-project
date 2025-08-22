@@ -9,6 +9,7 @@ export interface ITodoList extends Document {
     isReported: boolean,
     isPrivate: boolean,
     isSoftDeleted: boolean,
+    isCompleted: boolean,
 }
 
 const todolistSchema = new mongoose.Schema<ITodoList>(
@@ -37,6 +38,10 @@ const todolistSchema = new mongoose.Schema<ITodoList>(
             default: []
         },
         isReported: {
+            type: Boolean,
+            default: false
+        },
+        isCompleted: {
             type: Boolean,
             default: false
         },

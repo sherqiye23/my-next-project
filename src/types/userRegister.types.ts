@@ -1,5 +1,5 @@
 export interface UserRegister extends UserRegisterFront {
-    id: string;
+    _id: string;
 };
 
 export interface UserRegisterFront {
