@@ -11,6 +11,9 @@ import axios, { AxiosError } from 'axios';
 import toast from 'react-hot-toast';
 import { GoPencil } from 'react-icons/go';
 import ScrollCategories from '@/components/User/Scroll Categories';
+import ModalComponent from '@/components/Modal component';
+import ProfileHeader from '@/components/User/User Profile components/ProfileHeader';
+import { BannerChangeModal } from '@/components/User/User Profile components/Profile Modals/BannerChangeModal';
 
 export interface FakeCategory {
   name: string,
@@ -24,6 +27,15 @@ export interface TaskType {
   time: string,
   color: string,
   isCompleted: boolean
+}
+
+export interface ErrorResponseData {
+  message?: string;
+  error?: string;
+}
+
+interface ProfileInfo {
+  profileImg: File | null,
 }
 
 const tasks: TaskType[] = [
@@ -106,44 +118,42 @@ const fakeCate: FakeCategory[] = [
 
 const UserProfile = () => {
   const { userInfo, setUserInfo, isLoading } = useMyContext()
-  const editRef = useRef<HTMLDivElement>(null)
   const [loading, setLoading] = useState<boolean>(false)
+
   const [bannerImageUrl, setBannerImageUrl] = useState<string>("");
-  const bannerInputRef = useRef<HTMLInputElement>(null);
+
+  const [profileImageUrl, setProfileImageUrl] = useState<string>("");
+  const profileInputRef = useRef<HTMLInputElement>(null);
+
   const [mapTasks, setMapTasks] = useState<TaskType[]>([])
-  interface ErrorResponseData {
-    message?: string;
-    error?: string;
-  }
-  interface SignInfo {
-    bannerImg: File | null,
-  }
-  const initialValues: SignInfo = {
-    bannerImg: null,
+
+
+  //profile
+  const initialValuesProfile: ProfileInfo = {
+    profileImg: null,
   };
-  const onSubmit = async (values: SignInfo) => {
-    console.log(values);
+  const onSubmitProfile = async (values: ProfileInfo) => {
     try {
       setLoading(true)
       const formData = new FormData()
-      if (values.bannerImg) {
-        formData.append("bannerImg", values.bannerImg);
+      if (values.profileImg) {
+        formData.append("profileImg", values.profileImg);
       }
       if (userInfo?._id) {
         formData.append("userId", userInfo?._id);
       }
-      const changeBanner = await axios.put('/api/users/put/updatebannerimage', formData, {
+      const changeProfile = await axios.put('/api/users/put/updateprofileimage', formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         }
       });
-      console.log(changeBanner);
+      console.log(changeProfile);
       setUserInfo({
         ...userInfo!,
-        bannerImg: changeBanner.data.bannerImg
+        profileImg: changeProfile.data.profileImg
       });
-      toast.success("Change your banner image")
-      const dialog = document.getElementById("my_modal_change_banner") as HTMLDialogElement | null;
+      toast.success("Change your profile image")
+      const dialog = document.getElementById("my_modal_change_profile") as HTMLDialogElement | null;
       dialog?.close();
     } catch (error) {
       const err = error as AxiosError;
@@ -156,8 +166,35 @@ const UserProfile = () => {
     }
   };
 
-  const clickDots = () => {
-    editRef.current?.classList.toggle("hidden");
+  const deleteProfileFunction = async () => {
+    try {
+      setLoading(true)
+      const formData = new FormData()
+      if (userInfo?._id) {
+        formData.append("userId", userInfo?._id);
+      }
+      formData.append("profileImg", '');
+      const changeProfile = await axios.put('/api/users/put/updateprofileimage', formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        }
+      });
+      setUserInfo({
+        ...userInfo!,
+        profileImg: changeProfile.data.profileImg
+      });
+      toast.success("Delete your profile image")
+      const dialog = document.getElementById("my_modal_change_profile") as HTMLDialogElement | null;
+      dialog?.close();
+    } catch (error) {
+      const err = error as AxiosError;
+      console.log('Change image failed: ', err);
+      const data = err.response?.data as ErrorResponseData;
+      const message = data?.message || data?.error || err.message;
+      toast.error(message || 'Something went wrong');
+    } finally {
+      setLoading(false)
+    }
   }
 
   // buttons
@@ -192,58 +229,10 @@ const UserProfile = () => {
         ) : (
           <div className="flex flex-col min-h-[100vh] mx-auto my-0 max-w-[1350px]">
             {/* profile header */}
-            <div className="px-3">
-              <div className="bg-[var(--component-bg)] min-w-64 rounded-xl shadow-md">
-                {/* profile images */}
-                <div className="h-45 rounded-t-xl relative"
-                  style={{
-                    backgroundImage: `url(${cloudinaryUrl + userInfo?.bannerImg})`,
-                    backgroundSize: "cover",
-                    backgroundPosition: "center",
-                  }}
-                >
-                  <div className='absolute left-5 bottom-[-50px]'>
-                    <div className='relative'>
-                      <img src={cloudinaryUrl + userInfo?.profileImg} alt="profile" className="w-30 h-30 rounded-full border-4 border-white object-cover" />
-                      <div className='text-white p-1 rounded-full bg-gray-500/50 w-8 h-8 flex items-center justify-center absolute right-0 bottom-3 cursor-pointer'><RiImageEditLine /></div>
-                    </div>
-                  </div>
-                  <div onClick={() => {
-                    const dialog = document.getElementById("my_modal_change_banner") as HTMLDialogElement | null;
-                    dialog?.showModal();
-                    setBannerImageUrl("")
-                  }}
-                    className='text-white p-1 rounded-full bg-gray-500/50 w-8 h-8 flex items-center justify-center absolute right-2 top-2 cursor-pointer'><RiEdit2Line /></div>
-                </div>
-
-                {/* Məlumat hissəsi */}
-                <div className="pt-15 px-5 pb-4 flex flex-col gap-1">
-                  <div className='flex items-center justify-between p-1 relative'>
-                    <h2 className="text-lg font-semibold">
-                      {userInfo?.username}
-                    </h2>
-                    <div onClick={() => clickDots()}
-                      className='cursor-pointer rounded-full p-1 w-8 h-8 flex items-center justify-center hover:bg-blue-400/20'>•••</div>
-                    <div ref={editRef} className='bg-base-100 shadow-md p-2 rounded-xl absolute top-full right-0 hidden'>
-                      <p className='flex items-center gap-2 p-1 rounded cursor-pointer hover:bg-blue-400/20'>
-                        <span className=''><FaUserEdit /></span>
-                        <span>Profile Edit</span>
-                      </p>
-                      <p className='flex items-center gap-2 p-1 rounded cursor-pointer hover:bg-blue-400/20'>
-                        <span className=''><TbLockPassword /></span>
-                        <span>Change Password</span>
-                      </p>
-                    </div>
-                  </div>
-                  <Link href="/favorites">
-                    <p className='flex items-center gap-2 py-1 px-2 rounded cursor-pointer hover:bg-blue-400/20'>
-                      <span className='text-yellow-300'><FaStar /></span>
-                      <span>Favorites</span>
-                    </p>
-                  </Link>
-                </div>
-              </div>
-            </div>
+            <ProfileHeader
+              userInfo={userInfo}
+              setBannerImageUrl={setBannerImageUrl}
+              setProfileImageUrl={setProfileImageUrl} />
 
             {/* Main Content */}
             <main className="flex-1 p-6">
@@ -309,70 +298,80 @@ const UserProfile = () => {
             </main >
 
             {/* modalssss */}
-            <dialog id="my_modal_change_banner" className="modal">
-              <div className="modal-box">
-                <form method="dialog">
-                  <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
-                </form>
-                <Formik
-                  initialValues={initialValues}
-                  onSubmit={onSubmit}
-                >
-                  {({ setFieldValue }) => {
-                    useEffect(() => {
-                      const dialog = document.getElementById("my_modal_change_banner") as HTMLDialogElement | null;
-                      if (!dialog) return;
+            <BannerChangeModal
+              userInfo={userInfo}
+              setUserInfo={setUserInfo}
+              loading={loading}
+              setLoading={setLoading}
+              setBannerImageUrl={setBannerImageUrl}
+              bannerImageUrl={bannerImageUrl} />
+            {/* change pp */}
+            <ModalComponent
+              id='my_modal_change_profile'
+              title='Change Profile Image'>
+              <Formik
+                initialValues={initialValuesProfile}
+                onSubmit={onSubmitProfile}
+              >
+                {({ setFieldValue }) => {
+                  useEffect(() => {
+                    const dialog = document.getElementById("my_modal_change_profile") as HTMLDialogElement | null;
+                    if (!dialog) return;
 
-                      const handleClose = () => {
-                        setBannerImageUrl("");
-                        setFieldValue("bannerImg", null);
-                      };
+                    const handleClose = () => {
+                      setProfileImageUrl("");
+                      setFieldValue("profileImg", null);
+                    };
 
-                      dialog.addEventListener("close", handleClose);
-                      return () => dialog.removeEventListener("close", handleClose);
-                    }, [setFieldValue]);
-                    return (
-                      <Form>
-                        <fieldset className="w-full fieldset bg-base-200 border-base-300 rounded-box border p-4">
-                          <legend className="fieldset-legend">{loading ? 'Processing' : 'Banner'}</legend>
-                          <div>
-                            <div
-                              className="w-full h-[150px] rounded hover:opacity-60 flex items-center justify-center text-gray-600 text-xl text-center transition-all duration-200 ease-in cursor-pointer"
-                              style={{
-                                backgroundSize: "cover",
-                                backgroundPosition: "center",
-                                backgroundImage: `url(${bannerImageUrl ? bannerImageUrl : cloudinaryUrl + userInfo?.bannerImg})`,
+                    dialog.addEventListener("close", handleClose);
+                    return () => dialog.removeEventListener("close", handleClose);
+                  }, [setFieldValue]);
+                  return (
+                    <Form>
+                      <fieldset className="w-full fieldset bg-base-200 border-base-300 rounded-box border p-4">
+                        <legend className="fieldset-legend">{loading ? 'Processing' : 'Profile'}</legend>
+                        <div className='flex items-center justify-center'>
+                          <div
+                            className="w-[200px] h-[200px] rounded hover:opacity-60 flex items-center justify-center text-gray-600 text-xl text-center transition-all duration-200 ease-in cursor-pointer"
+                            style={{
+                              backgroundSize: "cover",
+                              backgroundPosition: "center",
+                              backgroundImage: `url(${profileImageUrl ? profileImageUrl : cloudinaryUrl + userInfo?.profileImg})`,
+                            }}
+                            onClick={() => profileInputRef.current?.click()}
+                          >
+                            {(<GoPencil className="cursor-pointer" />)}
+                            <input
+                              type="file"
+                              name="profileImg"
+                              ref={profileInputRef}
+                              accept="image/*"
+                              style={{ display: "none" }}
+                              onChange={(e) => {
+                                const selectedFile = e.target.files?.[0];
+                                if (selectedFile) {
+                                  setProfileImageUrl(URL.createObjectURL(selectedFile));
+                                  setFieldValue("profileImg", selectedFile);
+                                }
                               }}
-                              onClick={() => bannerInputRef.current?.click()}
-                            >
-                              {(<GoPencil className="cursor-pointer" />)}
-                              <input
-                                type="file"
-                                name="bannerImg"
-                                ref={bannerInputRef}
-                                accept="image/*"
-                                style={{ display: "none" }}
-                                onChange={(e) => {
-                                  const selectedFile = e.target.files?.[0];
-                                  if (selectedFile) {
-                                    setBannerImageUrl(URL.createObjectURL(selectedFile));
-                                    setFieldValue("bannerImg", selectedFile);
-                                  }
-                                }}
-                              />
-                            </div>
+                            />
                           </div>
+                        </div>
 
-                          <button disabled={loading} className={`btn btn-outline btn-info my-2 hover:text-white ${loading ? 'cursor-not-allowed' : 'cursor-pointer'}`}>
-                            Change Banner
-                          </button>
-                        </fieldset>
-                      </Form>
-                    )
-                  }}
-                </Formik>
-              </div>
-            </dialog>
+                        <button disabled={profileImageUrl.length === 0 || loading}
+                          className={`btn btn-outline btn-info mt-2 hover:text-white ${loading ? 'cursor-not-allowed' : 'cursor-pointer'}`}>
+                          Change Profile
+                        </button>
+                        <button onClick={() => deleteProfileFunction()} type='button' disabled={loading} className={`btn btn-outline btn-error hover:text-white ${loading ? 'cursor-not-allowed' : 'cursor-pointer'}`}>
+                          Delete Profile
+                        </button>
+                      </fieldset>
+                    </Form>
+                  )
+                }}
+              </Formik>
+            </ModalComponent>
+
           </div >
         )
       }

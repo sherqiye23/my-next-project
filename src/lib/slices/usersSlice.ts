@@ -1,0 +1,170 @@
+import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+
+export interface GetAll {
+    _id: number;
+    createdAt: string;
+    _v: number;
+    username: string,
+    email: string,
+    password: string,
+    isAdmin: boolean,
+    profileImg: string,
+    bannerImg: string,
+    favoritesId: string,
+    todoListIds: string[],
+    chatIds: string[],
+}
+
+interface LoginRequest {
+    email: string;
+    password: string;
+    rememberMe: boolean;
+}
+interface LoginResponse {
+    accessToken: string;
+}
+
+export const usersApi = createApi({
+    reducerPath: "usersApi",
+    baseQuery: fetchBaseQuery({
+        baseUrl: "/api/users/",
+        prepareHeaders: (headers) => {
+            const token = localStorage.getItem("accessToken");
+            if (token) {
+                headers.set("Authorization", `Bearer ${token}`);
+            }
+            return headers;
+        },
+    }),
+    endpoints: (builder) => ({
+        // get requests
+        getAllUsers: builder.query<GetAll[], void>({
+            query: () => "get/getall",
+        }),
+        getAllFavorites: builder.query({
+            query: (id) => `get/getallfavorites/${id}`,
+        }),
+        getByUsername: builder.query({
+            query: (username) => `get/getbyusername?username=${username}`,
+        }),
+        // post requests
+        addToFavorites: builder.mutation<GetAll, Partial<GetAll>>({
+            query: (newFavorites) => ({
+                url: 'post/addtofavorites',
+                method: 'POST',
+                body: newFavorites,
+                headers: { 'Content-Type': 'application/json' }
+            }),
+        }),
+        loginUser: builder.mutation<LoginResponse, LoginRequest>({
+            query: (newUser) => ({
+                url: 'post/login',
+                method: 'POST',
+                body: newUser,
+                headers: { 'Content-Type': 'application/json' }
+            }),
+        }),
+        logoutUser: builder.mutation({
+            query: () => ({
+                url: 'post/logout',
+                method: 'POST',
+            }),
+        }),
+        sendOtpUser: builder.mutation({
+            query: (sendOtp) => ({
+                url: 'post/send-otp',
+                method: 'POST',
+                body: sendOtp,
+                headers: { 'Content-Type': 'application/json' }
+            }),
+        }),
+        verifyOtpUser: builder.mutation({
+            query: (verifyOtp) => ({
+                url: 'post/verify-otp',
+                method: 'POST',
+                body: verifyOtp,
+            }),
+        }),
+        resetPasswordUser: builder.mutation({
+            query: (newPassword) => ({
+                url: 'post/reset-password',
+                method: 'POST',
+                body: newPassword,
+                headers: { 'Content-Type': 'application/json' }
+            }),
+        }),
+        forgotPasswordSendOtpUser: builder.mutation({
+            query: (sendOtp) => ({
+                url: 'post/forgot-password-send-otp',
+                method: 'POST',
+                body: sendOtp,
+                headers: { 'Content-Type': 'application/json' }
+            }),
+        }),
+        forgotPasswordVerifyOtpUser: builder.mutation({
+            query: (verifyOtp) => ({
+                url: 'post/forgot-password-verify-otp',
+                method: 'POST',
+                body: verifyOtp,
+                headers: { 'Content-Type': 'application/json' }
+            }),
+        }),
+        // put requests
+        updateBannerUser: builder.mutation({
+            query: (updateBanner) => ({
+                url: 'put/updatebannerimage',
+                method: 'PUT',
+                body: updateBanner,
+            }),
+        }),
+        updateProfileUser: builder.mutation({
+            query: (updateProfile) => ({
+                url: 'put/updateprofileimage',
+                method: 'PUT',
+                body: updateProfile,
+            }),
+        }),
+        updateUsernameUser: builder.mutation({
+            query: (updateUsername) => ({
+                url: 'put/updateusername',
+                method: 'PUT',
+                body: updateUsername,
+                headers: { 'Content-Type': 'application/json' }
+            }),
+        }),
+        updatePasswordUser: builder.mutation({
+            query: ({ userId, oldPassword, newPassword, confirmPassword }) => ({
+                url: `updatepassword?userId=${userId}&oldPassword=${oldPassword}&newPassword=${newPassword}&confirmPassword=${confirmPassword}`,
+                method: 'PUT'
+            }),
+        }),
+        updateRoleUser: builder.mutation({
+            query: ({ userId, role }) => ({
+                url: `updaterole?userId=${userId}&role=${role}`,
+                method: 'PUT'
+            }),
+        }),
+        // delete requests
+        deleteFromFavoriteUser: builder.mutation({
+            query: (deleteFavorites) => ({
+                url: `delete/deletefromfavorites`,
+                method: 'DELETE',
+                body: deleteFavorites,
+                headers: { 'Content-Type': 'application/json' }
+            })
+        }),
+        deleteUser: builder.mutation({
+            query: (id) => ({
+                url: `delete/deleteuser/${id}`,
+                method: 'DELETE',
+            })
+        }),
+    }),
+});
+
+export const {
+    useGetAllUsersQuery, useGetAllFavoritesQuery, useGetByUsernameQuery,
+    useLoginUserMutation, useLogoutUserMutation, useSendOtpUserMutation, useVerifyOtpUserMutation, useAddToFavoritesMutation, useForgotPasswordSendOtpUserMutation, useForgotPasswordVerifyOtpUserMutation, useResetPasswordUserMutation,
+    useUpdateBannerUserMutation, useUpdatePasswordUserMutation, useUpdateProfileUserMutation, useUpdateRoleUserMutation, useUpdateUsernameUserMutation,
+    useDeleteFromFavoriteUserMutation, useDeleteUserMutation
+} = usersApi;

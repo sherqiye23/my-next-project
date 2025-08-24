@@ -9,13 +9,25 @@ type CloudinaryResultType = {
 };
 
 const DEFAULT_IMAGE = "v1753739717/vcw9wjll2wphh2btpkym.jpg";
-
+export const config = {
+    api: {
+        bodyParser: false,
+    },
+};
 export async function PUT(request: NextRequest) {
     try {
-        const reqBody = await request.json()
-        const { profileImg, userId } = reqBody
+        const formData = await request.formData();
+        const profileImg = formData.get("profileImg");
+        const userId = formData.get("userId");
 
-        const userFind = await User.findOne({ _id: userId });
+        if (!userId) {
+            return NextResponse.json({
+                message: "User is not found",
+                success: false
+            }, { status: 404 });
+        }
+
+        const userFind = await User.findById(userId);
         if (!userFind) {
             return NextResponse.json({
                 message: "User not found",
@@ -26,18 +38,25 @@ export async function PUT(request: NextRequest) {
         // image upload cloudinary
         // profile img
         let sendProfileImg = userFind.profileImg
-        if (profileImg instanceof File) {
-            const oldProfileImgUrlPart = userFind.profileImg;
-            if (oldProfileImgUrlPart && oldProfileImgUrlPart !== DEFAULT_IMAGE) {
-                try {
-                    const publicIdWithVersion = oldProfileImgUrlPart.substring(0, oldProfileImgUrlPart.lastIndexOf('.'));
-                    await cloudinary.uploader.destroy(publicIdWithVersion);
-                    console.log('Old profile image deleted');
-                } catch (error) {
-                    console.error('Deleted Error:', error);
-                }
-            }
+        // delete old image from cloudinary
+        const oldProfileImgUrlPart = userFind.profileImg;
+        if (oldProfileImgUrlPart && oldProfileImgUrlPart !== DEFAULT_IMAGE) {
+            try {
+                const urlParts = oldProfileImgUrlPart.split('/');
+                const folder = urlParts[1];
+                const fileWithExtension = urlParts[2];
+                const fileWithoutExtension = fileWithExtension.substring(0, fileWithExtension.lastIndexOf('.'));
 
+                const publicId = `${folder}/${fileWithoutExtension}`;
+                await cloudinary.uploader.destroy(publicId);
+
+                console.log('Old profile image deleted:', publicId);
+            } catch (error) {
+                console.error('Deleted Error:', error);
+            }
+        }
+        // upload new image to cloudinary
+        if (profileImg instanceof File) {
             const arrayBuffer = await profileImg.arrayBuffer();
             const buffer = Buffer.from(arrayBuffer);
 
@@ -66,14 +85,13 @@ export async function PUT(request: NextRequest) {
             sendProfileImg = DEFAULT_IMAGE
         }
 
-        await User.findByIdAndUpdate(userId, {
-            profileImg: sendProfileImg
-        });
+        const updatedProfile = await User.findByIdAndUpdate(
+            userId,
+            { profileImg: sendProfileImg },
+            { new: true }
+        );
 
-        return NextResponse.json({
-            message: 'Profile image updated',
-            success: true
-        });
+        return NextResponse.json(updatedProfile, { status: 200 });
 
     } catch (error: unknown) {
         if (error instanceof mongoose.Error.ValidationError) {

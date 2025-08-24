@@ -22,12 +22,12 @@ export async function PUT(request: NextRequest) {
 
         if (!userId) {
             return NextResponse.json({
-                message: "User id not found",
+                message: "User is not found",
                 success: false
             }, { status: 404 });
         }
 
-        const userFind = await User.findOne({ _id: userId });
+        const userFind = await User.findById(userId);
         if (!userFind) {
             return NextResponse.json({
                 message: "User not found",
@@ -38,18 +38,24 @@ export async function PUT(request: NextRequest) {
         // image upload cloudinary
         // banner img
         let sendBannerImg = userFind.bannerImg
-        if (bannerImg instanceof File) {
-            const oldBannerImgUrlPart = userFind.bannerImg;
-            if (oldBannerImgUrlPart && oldBannerImgUrlPart !== DEFAULT_BANNER) {
-                try {
-                    const publicIdWithVersion = oldBannerImgUrlPart.substring(0, oldBannerImgUrlPart.lastIndexOf('.'));
-                    await cloudinary.uploader.destroy(publicIdWithVersion);
-                    console.log('Old banner image deleted');
-                } catch (error) {
-                    console.error('Deleted Error:', error);
-                }
-            }
+        // delete old image from cloudinary
+        const oldBannerImgUrlPart = userFind.bannerImg;
+        if (oldBannerImgUrlPart && oldBannerImgUrlPart !== DEFAULT_BANNER) {
+            try {
+                const urlParts = oldBannerImgUrlPart.split('/');
+                const folder = urlParts[1];
+                const fileWithExtension = urlParts[2];
+                const fileWithoutExtension = fileWithExtension.substring(0, fileWithExtension.lastIndexOf('.'));
 
+                const publicId = `${folder}/${fileWithoutExtension}`;
+                await cloudinary.uploader.destroy(publicId);
+
+                console.log('Old banner image deleted:', publicId);
+            } catch (error) {
+                console.error('Deleted Error:', error);
+            }
+        }
+        if (bannerImg instanceof File) {
             const arrayBuffer = await bannerImg.arrayBuffer();
             const buffer = Buffer.from(arrayBuffer);
 

@@ -4,11 +4,13 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 import User from "@/models/userModel";
 import Favorites from "@/models/favoritesModel";
 import mongoose from 'mongoose';
+import TodoList from "@/models/todolistModel";
+import Todo from "@/models/todoModel";
 
 interface Context {
-  params: Promise<{
-    id: string;
-  }>;
+    params: Promise<{
+        id: string;
+    }>;
 }
 
 const SECRET = process.env.JWT_SECRET!;
@@ -48,9 +50,13 @@ export async function DELETE(
         if (!decoded.isAdmin) {
             return NextResponse.json({ message: "You are not admin" }, { status: 403 });
         }
-        // all todolists, all comment deleted
+        // all comment deleted
         // chat and messages deleted user
         await Favorites.findByIdAndDelete(deletedUser.favoritesId);
+        const todoListsToDelete = await TodoList.find({ createdById: userId });
+        const todoListIds = todoListsToDelete.map(list => list._id);
+        await Todo.deleteMany({ todoListId: { $in: todoListIds } });
+        await TodoList.deleteMany({ createdById: userId });
         await User.findByIdAndDelete(userId);
         return NextResponse.json({ message: `User deleted` }, { status: 200 });
     } catch (error: unknown) {

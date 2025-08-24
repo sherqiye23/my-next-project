@@ -52,7 +52,6 @@ export async function DELETE(
         // user, category, favorites, comments -> bunlara baglidir deye silinme isi bunlardan da kececek
 
         await TodoList.findByIdAndDelete(todolistId);
-        // icindeki todolari da silirik
         await Todo.deleteMany({ todoListId: todolistId });
         return NextResponse.json({ message: `Todo List deleted` }, { status: 200 });
     } catch (error: unknown) {

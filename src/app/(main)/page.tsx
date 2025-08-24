@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 import { useSession, signOut as nextAuthSignOut } from "next-auth/react";
 import axios, { AxiosError } from "axios";
 import toast from "react-hot-toast";
+import Link from "next/link";
 
 interface ErrorResponseData {
   message?: string;
@@ -95,8 +96,11 @@ export default function Home() {
           <span className="loading loading-spinner text-[#FD6406] fixed top-[50%] left-[50%] "></span>
         ) : (
           <div className="grid grid-cols-[1fr_4fr_1fr] gap-2">
-            <div className="w-full bg-[var(--component-bg)] h-[50vh] rounded-xl p-5">
+            <div className="w-full flex flex-col gap-2 bg-[var(--component-bg)] h-[50vh] rounded-xl p-5">
               <button className="px-3 py-1 rounded-xl bg-red-500 text-white cursor-pointer" onClick={() => logOutFunction()}>LogOut</button>
+              <Link href={'/profile'}>
+                <button className="px-3 py-1 rounded-xl bg-blue-400 text-white cursor-pointer">Profile</button>
+              </Link>
             </div>
             <div className="w-full flex flex-col gap-2">
               <div>
