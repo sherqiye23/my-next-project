@@ -1,20 +1,20 @@
-import { connect } from "@/dbConfig/dbConfig";
 import User from "@/models/userModel";
 import mongoose from 'mongoose';
 import { NextRequest, NextResponse } from "next/server";
-
-connect();
 
 export async function GET(request: NextRequest) {
     try {
         const { searchParams } = new URL(request.url);
         const username = searchParams.get("username");
+        const lowerName = username?.toLowerCase()
 
-        if (!username) {
+        if (!lowerName) {
             return NextResponse.json({ error: "Username is required" }, { status: 400 });
         }
 
-        const user = await User.findOne({ username });
+        const user = await User.findOne({ 
+            username: { $regex: new RegExp(`^${username}$`, 'i') } 
+         });
         if (!user) {
             return NextResponse.json({ error: "User not found" }, { status: 404 });
         }

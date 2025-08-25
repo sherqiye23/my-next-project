@@ -1,9 +1,6 @@
-import { connect } from "@/dbConfig/dbConfig";
 import User from "@/models/userModel";
 import mongoose from 'mongoose';
 import { NextResponse } from "next/server";
-
-connect();
 
 export async function GET() {
     try {

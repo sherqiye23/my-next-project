@@ -1,9 +1,6 @@
-import { connect } from "@/dbConfig/dbConfig";
 import Todo from "@/models/todoModel";
 import mongoose from 'mongoose';
 import { NextResponse } from "next/server";
-
-connect();
 
 export async function GET() {
     try {

@@ -1,11 +1,9 @@
-import { connect } from "@/dbConfig/dbConfig";
 import User from "@/models/userModel";
 import { NextRequest, NextResponse } from "next/server";
 import bcryptjs from 'bcryptjs';
 import mongoose from 'mongoose';
 import jwt from 'jsonwebtoken';
 
-connect()
 // login checks
 export async function POST(request: NextRequest) {
     try {

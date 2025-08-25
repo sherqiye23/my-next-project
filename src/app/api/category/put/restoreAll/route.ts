@@ -4,7 +4,6 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 import mongoose from 'mongoose';
 import Category from "@/models/categoryModel";
 
-
 const SECRET = process.env.JWT_SECRET!;
 interface MyJwtPayload extends JwtPayload {
     id: string;

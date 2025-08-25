@@ -2,12 +2,10 @@ import cache from "@/lib/cache";
 import { NextRequest, NextResponse } from "next/server";
 import bcryptjs from 'bcryptjs';
 import User from "@/models/userModel";
-import { connect } from "@/dbConfig/dbConfig";
 import Favorites from "@/models/favoritesModel";
 import mongoose from 'mongoose';
 import cloudinary from "@/lib/cloudinary";
 
-connect()
 type CloudinaryResultType = {
     secure_url: string;
     public_id: string;

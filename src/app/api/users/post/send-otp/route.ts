@@ -1,11 +1,8 @@
 import User from "@/models/userModel";
 import { sendMail } from "@/utils/mail";
 import { NextRequest, NextResponse } from "next/server";
-import { connect } from "@/dbConfig/dbConfig";
 import mongoose from 'mongoose';
 import cache from "@/lib/cache";
-
-connect()
 
 function generateOtp() {
     return Math.floor(100000 + Math.random() * 900000).toString();

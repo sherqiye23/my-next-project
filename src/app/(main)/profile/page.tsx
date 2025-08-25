@@ -212,7 +212,7 @@ const UserProfile = () => {
 
   // map tasks
   useEffect(() => {
-    let filtertasks = tasks.filter(task => !task.isCompleted)
+    const filtertasks = tasks.filter(task => !task.isCompleted)
     setMapTasks(filtertasks)
   }, [tasks])
 
@@ -250,7 +250,7 @@ const UserProfile = () => {
               <div className="flex items-center justify-between mb-4">
                 <div className="flex gap-4">
                   <button onClick={() => {
-                    let filtertasks = tasks.filter(task => !task.isCompleted)
+                    const filtertasks = tasks.filter(task => !task.isCompleted)
                     setMapTasks(filtertasks)
                     handleFilter("active")
                   }}
@@ -261,7 +261,7 @@ const UserProfile = () => {
                     Active Task
                   </button>
                   <button onClick={() => {
-                    let filtertasks = tasks.filter(task => task.isCompleted)
+                    const filtertasks = tasks.filter(task => task.isCompleted)
                     setMapTasks(filtertasks)
                     handleFilter("completed")
                   }}

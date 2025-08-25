@@ -26,7 +26,7 @@ export async function GET(
             return NextResponse.json([], { status: 200 });
         }
 
-        let favTodoList = [];
+        const favTodoList = [];
         for (let index = 0; index < findFavorites.todoListIds.length; index++) {
             const find = await TodoList.findById(findFavorites.todoListIds[index])
             favTodoList.push(find)

@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import mongoose from 'mongoose';
 import Category from "@/models/categoryModel";
+import TodoList from "@/models/todolistModel";
 
 interface Context {
     params: Promise<{
@@ -49,10 +50,10 @@ export async function DELETE(
         }
 
         // all todolists category ise null olacaq ve filterlemede otherde gosterilecek
-        // await TodoList.updateMany(
-        //     { categoryId: categoryId },
-        //     { $set: { categoryId: null, categoryDeleted: true } }
-        // );
+        await TodoList.updateMany(
+            { categoryId: categoryId },
+            { $set: { categoryId: null, categoryDeleted: true } }
+        );
 
         await Category.findByIdAndDelete(categoryId);
         return NextResponse.json({ message: `Category deleted` }, { status: 200 });

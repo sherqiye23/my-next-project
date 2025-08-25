@@ -1,21 +1,16 @@
-import { notFound } from "next/navigation";
+import UserProfileClient from "@/components/User/Other userpage components/UserProfileClient";
 import React from "react";
 
 interface Props {
-    params: {
-        username: string;
-    };
+    params: Promise<{ username: string }>;
 }
 
-export default function UserProfilePag({ params }: Props) {
-    let user;
-    if (!user) {
-        notFound();
+export default async function UserProfilePag({ params }: Props) {
+    const { username } = await params;
+
+    if (!username) {
+        return;
     }
 
-    return (
-        <div>
-            <h1>Salam {params.username}</h1>
-        </div>
-    );
+    return <UserProfileClient username={username} />
 }
