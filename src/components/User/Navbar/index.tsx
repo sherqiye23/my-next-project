@@ -5,6 +5,7 @@ import Logo from '../../../images/TodoEast-Logo.png'
 import { IoChatbubblesOutline, IoNotificationsOutline } from "react-icons/io5";
 import { useRouter } from 'next/navigation';
 import ThemeButton from '../Theme';
+import Link from 'next/link';
 
 const Navbar = () => {
   const route = useRouter()
@@ -14,14 +15,14 @@ const Navbar = () => {
       <div className='mx-auto my-0 max-w-[1350px] flex items-center justify-between'>
         {/* logo */}
         <div className="container flex justify-between">
-          <div>
+          <Link href={'/'}>
             <Image
               src={Logo}
               alt="Logo"
               className="object-cover cursor-pointer w-[150px]"
               layout="intrinsic"
             />
-          </div>
+          </Link>
         </div>
         {/* buttons */}
         <div className='flex items-center justify-center text-2xl'>

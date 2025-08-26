@@ -37,14 +37,13 @@ export async function PUT(request: NextRequest) {
             }, { status: 400 });
         }
 
-        await User.findByIdAndUpdate(userId, {
-            username: trimmedName,
-        });
+        const updatedUsername = await User.findByIdAndUpdate(
+            userId,
+            { username: trimmedName },
+            { new: true }
+        );
 
-        return NextResponse.json({
-            message: 'Username updated',
-            success: true
-        });
+        return NextResponse.json(updatedUsername, { status: 200 });
 
     } catch (error: unknown) {
         if (error instanceof mongoose.Error.ValidationError) {

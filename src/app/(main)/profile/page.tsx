@@ -2,18 +2,14 @@
 import { useMyContext } from '@/context/UserEmailContext';
 import React, { useEffect, useRef, useState } from 'react';
 import { cloudinaryUrl } from '@/lib/urls';
-import { FaPlus, FaStar, FaUserEdit } from "react-icons/fa";
-import { TbLockPassword } from "react-icons/tb";
-import { RiEdit2Line, RiImageEditLine } from "react-icons/ri";
-import Link from 'next/link';
+import { FaPlus } from "react-icons/fa";
 import { Form, Formik } from 'formik';
 import axios, { AxiosError } from 'axios';
 import toast from 'react-hot-toast';
 import { GoPencil } from 'react-icons/go';
 import ScrollCategories from '@/components/User/Scroll Categories';
 import ModalComponent from '@/components/Modal component';
-import ProfileHeader from '@/components/User/User Profile components/ProfileHeader';
-import { BannerChangeModal } from '@/components/User/User Profile components/Profile Modals/BannerChangeModal';
+import { ErrorResponseData } from '@/types/catchError.types';
 
 export interface FakeCategory {
   name: string,
@@ -27,11 +23,6 @@ export interface TaskType {
   time: string,
   color: string,
   isCompleted: boolean
-}
-
-export interface ErrorResponseData {
-  message?: string;
-  error?: string;
 }
 
 interface ProfileInfo {
@@ -228,12 +219,6 @@ const UserProfile = () => {
           </div>
         ) : (
           <div className="flex flex-col min-h-[100vh] mx-auto my-0 max-w-[1350px]">
-            {/* profile header */}
-            <ProfileHeader
-              userInfo={userInfo}
-              setBannerImageUrl={setBannerImageUrl}
-              setProfileImageUrl={setProfileImageUrl} />
-
             {/* Main Content */}
             <main className="flex-1 p-6">
               {/* Header */}
@@ -296,82 +281,6 @@ const UserProfile = () => {
                 ))}
               </div>
             </main >
-
-            {/* modalssss */}
-            <BannerChangeModal
-              userInfo={userInfo}
-              setUserInfo={setUserInfo}
-              loading={loading}
-              setLoading={setLoading}
-              setBannerImageUrl={setBannerImageUrl}
-              bannerImageUrl={bannerImageUrl} />
-            {/* change pp */}
-            <ModalComponent
-              id='my_modal_change_profile'
-              title='Change Profile Image'>
-              <Formik
-                initialValues={initialValuesProfile}
-                onSubmit={onSubmitProfile}
-              >
-                {({ setFieldValue }) => {
-                  useEffect(() => {
-                    const dialog = document.getElementById("my_modal_change_profile") as HTMLDialogElement | null;
-                    if (!dialog) return;
-
-                    const handleClose = () => {
-                      setProfileImageUrl("");
-                      setFieldValue("profileImg", null);
-                    };
-
-                    dialog.addEventListener("close", handleClose);
-                    return () => dialog.removeEventListener("close", handleClose);
-                  }, [setFieldValue]);
-                  return (
-                    <Form>
-                      <fieldset className="w-full fieldset bg-base-200 border-base-300 rounded-box border p-4">
-                        <legend className="fieldset-legend">{loading ? 'Processing' : 'Profile'}</legend>
-                        <div className='flex items-center justify-center'>
-                          <div
-                            className="w-[200px] h-[200px] rounded hover:opacity-60 flex items-center justify-center text-gray-600 text-xl text-center transition-all duration-200 ease-in cursor-pointer"
-                            style={{
-                              backgroundSize: "cover",
-                              backgroundPosition: "center",
-                              backgroundImage: `url(${profileImageUrl ? profileImageUrl : cloudinaryUrl + userInfo?.profileImg})`,
-                            }}
-                            onClick={() => profileInputRef.current?.click()}
-                          >
-                            {(<GoPencil className="cursor-pointer" />)}
-                            <input
-                              type="file"
-                              name="profileImg"
-                              ref={profileInputRef}
-                              accept="image/*"
-                              style={{ display: "none" }}
-                              onChange={(e) => {
-                                const selectedFile = e.target.files?.[0];
-                                if (selectedFile) {
-                                  setProfileImageUrl(URL.createObjectURL(selectedFile));
-                                  setFieldValue("profileImg", selectedFile);
-                                }
-                              }}
-                            />
-                          </div>
-                        </div>
-
-                        <button disabled={profileImageUrl.length === 0 || loading}
-                          className={`btn btn-outline btn-info mt-2 hover:text-white ${loading ? 'cursor-not-allowed' : 'cursor-pointer'}`}>
-                          Change Profile
-                        </button>
-                        <button onClick={() => deleteProfileFunction()} type='button' disabled={loading} className={`btn btn-outline btn-error hover:text-white ${loading ? 'cursor-not-allowed' : 'cursor-pointer'}`}>
-                          Delete Profile
-                        </button>
-                      </fieldset>
-                    </Form>
-                  )
-                }}
-              </Formik>
-            </ModalComponent>
-
           </div >
         )
       }

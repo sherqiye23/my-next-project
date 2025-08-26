@@ -1,6 +1,6 @@
 'use client'
 import { FaRegStar, FaStar } from "react-icons/fa";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import '../globals.css'
 import { useGetAllCategoryQuery } from "@/lib/slices/categorySlice";
 import { useMyContext } from "@/context/UserEmailContext";
@@ -10,20 +10,98 @@ import { useSession, signOut as nextAuthSignOut } from "next-auth/react";
 import axios, { AxiosError } from "axios";
 import toast from "react-hot-toast";
 import Link from "next/link";
+import ProfileHeader from "@/components/User/User Profile components/ProfileHeader";
+import { BannerAndProfileChangeModal } from "@/components/User/User Profile components/Profile Modals/BannerAndProfileChangeModal";
+import { ErrorResponseData } from "@/types/catchError.types";
+import ModalComponent from "@/components/Modal component";
+import CustomFormik from "@/components/Form components";
+import * as Yup from 'yup';
+import { useUpdateUsernameUserMutation } from "@/lib/slices/usersSlice";
 
-interface ErrorResponseData {
-  message?: string;
-  error?: string;
-}
 interface FakeCategory {
   name: string,
   color: string
 }
 
+const fakeCate: FakeCategory[] = [
+  {
+    name: 'All',
+    color: '#c084fc'
+  },
+  {
+    name: 'Work',
+    color: '#ff27e2'
+  },
+  {
+    name: 'Shopping',
+    color: '#28a745'
+  },
+  {
+    name: 'School',
+    color: '#17a2b8'
+  },
+  {
+    name: 'Personal',
+    color: '#ffc107'
+  },
+  {
+    name: 'Birthday',
+    color: '#20c997'
+  },
+  {
+    name: 'Travel',
+    color: '#fd7e14'
+  },
+  {
+    name: 'Other',
+    color: '#2563EB'
+  }
+]
+
 export default function Home() {
   const { userInfo, setUserInfo, isLoading } = useMyContext()
   const { data: session } = useSession();
   const route = useRouter()
+  const [updateUsernameUser] = useUpdateUsernameUserMutation()
+  const [loading, setLoading] = useState<boolean>(false)
+  const [bannerImageUrl, setBannerImageUrl] = useState<string>("");
+  const [profileImageUrl, setProfileImageUrl] = useState<string>("");
+  const [changeUsername, setChangeUsername] = useState<string>("");
+  console.log(changeUsername);
+
+  const initialValues = [
+    { key: 'username', value: userInfo?.username },
+  ]
+  const fields = [
+    {
+      placeholder: 'Enter username',
+      type: 'text',
+      name: 'username',
+      title: 'Username'
+    },
+  ]
+  const validationSchema = Yup.object({
+    username: Yup.string().trim().required('Username is required').max(30, "max 30 characters")
+  });
+  type FormValues = Yup.InferType<typeof validationSchema>;
+
+  const changeUsernameSubmit = async (values: FormValues) => {
+    if (values.username !== userInfo?.username) {
+      setLoading(true)
+      const response = await updateUsernameUser({
+        username: values.username,
+        userId: userInfo?._id
+      }).unwrap()
+      setUserInfo({
+        ...userInfo!,
+        username: response.username
+      });
+      toast.success(`Change your username`)
+    }
+    const dialog = document.getElementById('my_modal_change_username') as HTMLDialogElement | null;
+    dialog?.close();
+    setChangeUsername('')
+  }
 
   const { data, isLoading: categoryLoading, isError, error } = useGetAllCategoryQuery()
   useEffect(() => {
@@ -36,40 +114,6 @@ export default function Home() {
     setActiveCategory(id);
   }
 
-  const fakeCate: FakeCategory[] = [
-    {
-      name: 'All',
-      color: '#c084fc'
-    },
-    {
-      name: 'Work',
-      color: '#ff27e2'
-    },
-    {
-      name: 'Shopping',
-      color: '#28a745'
-    },
-    {
-      name: 'School',
-      color: '#17a2b8'
-    },
-    {
-      name: 'Personal',
-      color: '#ffc107'
-    },
-    {
-      name: 'Birthday',
-      color: '#20c997'
-    },
-    {
-      name: 'Travel',
-      color: '#fd7e14'
-    },
-    {
-      name: 'Other',
-      color: '#2563EB'
-    }
-  ]
   const logOutFunction = async () => {
     if (session) {
       await nextAuthSignOut();
@@ -90,22 +134,61 @@ export default function Home() {
   }
 
   return (
-    <div className="h-[170vh]">
+    <div>
       {
         isLoading ? (
           <span className="loading loading-spinner text-[#FD6406] fixed top-[50%] left-[50%] "></span>
         ) : (
           <div className="grid grid-cols-[1fr_4fr_1fr] gap-2">
-            <div className="w-full flex flex-col gap-2 bg-[var(--component-bg)] h-[50vh] rounded-xl p-5">
-              <button className="px-3 py-1 rounded-xl bg-red-500 text-white cursor-pointer" onClick={() => logOutFunction()}>LogOut</button>
-              <Link href={'/profile'}>
-                <button className="px-3 py-1 rounded-xl bg-blue-400 text-white cursor-pointer">Profile</button>
-              </Link>
+            <div>
+              <ProfileHeader
+                userInfo={userInfo}
+                setChangeUsername={setChangeUsername}
+                setBannerImageUrl={setBannerImageUrl}
+                setProfileImageUrl={setProfileImageUrl} />
+              <BannerAndProfileChangeModal
+                modalId="my_modal_change_banner"
+                changeImageName="Banner"
+                userInfo={userInfo}
+                setUserInfo={setUserInfo}
+                loading={loading}
+                setLoading={setLoading}
+                setChangeImageUrl={setBannerImageUrl}
+                changeImageUrl={bannerImageUrl}
+              />
+              <BannerAndProfileChangeModal
+                modalId="my_modal_change_profile"
+                changeImageName="Profile"
+                userInfo={userInfo}
+                setUserInfo={setUserInfo}
+                loading={loading}
+                setLoading={setLoading}
+                setChangeImageUrl={setProfileImageUrl}
+                changeImageUrl={profileImageUrl}
+              />
+              <ModalComponent
+                id="my_modal_change_username"
+                title="Change Username">
+                <CustomFormik
+                  loading={loading}
+                  setLoading={setLoading}
+                  formName='Username'
+                  buttonText='Change Username'
+                  initialValues={initialValues}
+                  fields={fields}
+                  validationSchema={validationSchema}
+                  onSubmitFunction={changeUsernameSubmit} />
+
+              </ModalComponent>
             </div>
-            <div className="w-full flex flex-col gap-2">
-              <div>
+            <div className="w-full flex flex-col gap-2 pb-5">
+              <div className="flex gap-2 items-center">
                 <input type="search" name="search" id="search" placeholder="Search todo list"
                   className="p-2 rounded-xl bg-[var(--component-bg)] outline-none border-2 border-[var(--component-bg)] border-solid focus:border-[#b1caff91]" />
+                <button className="px-3 w-[100px] py-1 rounded-xl bg-red-500 text-white cursor-pointer" onClick={() => logOutFunction()}>LogOut</button>
+                <Link href={'/profile'}>
+                  <button className="px-3 py-1 rounded-xl bg-blue-400 text-white cursor-pointer">Profile</button>
+                </Link>
               </div>
               {
                 fakeCate.map((category, i) => (
@@ -138,17 +221,24 @@ export default function Home() {
                       </div>
 
                     </div>
-                    <div className="py-3 px-5 relative border-b-2 border-r-2 border-l-2 rounded-bl-xl rounded-br-xl cursor-pointer"
+                    <div className="py-3 px-5 relative rounded-bl-xl rounded-br-xl cursor-pointer"
                       style={{
+                        borderBottomWidth: '2px',
+                        borderLeftWidth: '2px',
+                        borderRightWidth: '2px',
                         borderColor: category.color,
                       }}>
                       See all comments
-                      <span className="absolute h-[13px] w-[1px] bottom-full left-full"
+                      <span className="absolute bottom-full left-full"
                         style={{
+                          width: '2px',
+                          height: '13px',
                           backgroundColor: category.color
                         }}></span>
-                      <span className="absolute h-[13px] w-[1px] bottom-full right-full"
+                      <span className="absolute bottom-full right-full"
                         style={{
+                          width: '1.5px',
+                          height: '13px',
                           backgroundColor: category.color
                         }}></span>
                     </div>
@@ -156,7 +246,7 @@ export default function Home() {
                 ))
               }
             </div>
-            <div className="w-full bg-[var(--component-bg)] rounded-xl p-5 max-h-fit">
+            <div className="bg-[var(--component-bg)] rounded-xl p-5 max-h-fit sticky top-[80px] self-start h-[fit-content]">
               <div>
                 {
                   categoryLoading ? (
@@ -199,6 +289,6 @@ export default function Home() {
           </div>
         )
       }
-    </div>
+    </div >
   );
 }

@@ -3,6 +3,7 @@ import { UserRegister } from '@/types/userRegister.types';
 import Link from 'next/link';
 import React, { useRef } from 'react'
 import { FaStar, FaUserEdit } from 'react-icons/fa';
+import { GoTasklist } from "react-icons/go";
 import { RiEdit2Line, RiImageEditLine } from 'react-icons/ri';
 import { TbLockPassword } from 'react-icons/tb';
 
@@ -10,8 +11,9 @@ type MyComponentProps = {
     userInfo?: UserRegister | null;
     setProfileImageUrl: React.Dispatch<React.SetStateAction<string>>;
     setBannerImageUrl: React.Dispatch<React.SetStateAction<string>>;
+    setChangeUsername: React.Dispatch<React.SetStateAction<string>>;
 }
-const ProfileHeader = ({ userInfo, setProfileImageUrl, setBannerImageUrl }: MyComponentProps) => {
+const ProfileHeader = ({ userInfo, setProfileImageUrl, setBannerImageUrl, setChangeUsername }: MyComponentProps) => {
     const editRef = useRef<HTMLDivElement>(null)
     // click dots
     const clickDots = () => {
@@ -20,18 +22,18 @@ const ProfileHeader = ({ userInfo, setProfileImageUrl, setBannerImageUrl }: MyCo
 
     return (
         <div className="px-3">
-            <div className="bg-[var(--component-bg)] min-w-64 rounded-xl shadow-md">
+            <div className="bg-[var(--component-bg)] min-w-64 rounded-xl">
                 {/* profile images */}
-                <div className="h-50 rounded-t-xl relative"
+                <div className="h-30 rounded-t-xl relative"
                     style={{
                         backgroundImage: `url(${cloudinaryUrl + userInfo?.bannerImg})`,
                         backgroundSize: "cover",
                         backgroundPosition: "center",
                     }}
                 >
-                    <div className='absolute left-5 bottom-[-50px]'>
+                    <div className='absolute left-5 bottom-[-40px]'>
                         <div className='relative'>
-                            <img src={cloudinaryUrl + userInfo?.profileImg} alt="profile" className="w-30 h-30 rounded-full border-4 border-white object-cover" />
+                            <img src={cloudinaryUrl + userInfo?.profileImg} alt="profile" className="w-25 h-25 rounded-full border-4 border-white object-cover" />
                             <div onClick={() => {
                                 const dialog = document.getElementById("my_modal_change_profile") as HTMLDialogElement | null;
                                 dialog?.showModal();
@@ -49,7 +51,7 @@ const ProfileHeader = ({ userInfo, setProfileImageUrl, setBannerImageUrl }: MyCo
                 </div>
 
                 {/* Məlumat hissəsi */}
-                <div className="pt-15 px-5 pb-4 flex flex-col gap-1">
+                <div className="pt-10 px-5 pb-4 flex flex-col gap-1">
                     <div className='flex items-center justify-between p-1 relative'>
                         <h2 className="text-lg font-semibold">
                             {userInfo?.username}
@@ -57,7 +59,12 @@ const ProfileHeader = ({ userInfo, setProfileImageUrl, setBannerImageUrl }: MyCo
                         <div onClick={() => clickDots()}
                             className='cursor-pointer rounded-full p-1 w-8 h-8 flex items-center justify-center hover:bg-blue-400/20'>•••</div>
                         <div ref={editRef} className='bg-base-100 shadow-md p-2 rounded-xl absolute top-full right-0 hidden'>
-                            <p className='flex items-center gap-2 p-1 rounded cursor-pointer hover:bg-blue-400/20'>
+                            <p onClick={() => {
+                                const dialog = document.getElementById("my_modal_change_username") as HTMLDialogElement | null;
+                                dialog?.showModal();
+                                setChangeUsername(userInfo?.username ? userInfo?.username : '')
+                            }}
+                                className='flex items-center gap-2 p-1 rounded cursor-pointer hover:bg-blue-400/20'>
                                 <span className=''><FaUserEdit /></span>
                                 <span>Profile Edit</span>
                             </p>
@@ -71,6 +78,12 @@ const ProfileHeader = ({ userInfo, setProfileImageUrl, setBannerImageUrl }: MyCo
                         <p className='flex items-center gap-2 py-1 px-2 rounded cursor-pointer hover:bg-blue-400/20'>
                             <span className='text-yellow-300'><FaStar /></span>
                             <span>Favorites</span>
+                        </p>
+                    </Link>
+                    <Link href="/profile">
+                        <p className='flex items-center gap-2 py-1 px-2 rounded cursor-pointer hover:bg-blue-400/20'>
+                            <span className='text-xl'><GoTasklist /></span>
+                            <span>Profile</span>
                         </p>
                     </Link>
                 </div>
