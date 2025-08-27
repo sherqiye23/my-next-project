@@ -6,18 +6,50 @@ import { FaStar, FaUserEdit } from 'react-icons/fa';
 import { GoTasklist } from "react-icons/go";
 import { RiEdit2Line, RiImageEditLine } from 'react-icons/ri';
 import { TbLockPassword } from 'react-icons/tb';
+import { useSession, signOut as nextAuthSignOut } from "next-auth/react";
+import toast from 'react-hot-toast';
+import { useRouter } from 'next/navigation';
+import { FetchBaseQueryError } from '@reduxjs/toolkit/query';
+import { ErrorResponseData } from '@/types/catchError.types';
+import { useLogoutUserMutation } from '@/lib/slices/usersSlice';
+import { IoLogOutOutline } from 'react-icons/io5';
 
 type MyComponentProps = {
     userInfo?: UserRegister | null;
+    setUserInfo: (info: UserRegister | null) => void;
     setProfileImageUrl: React.Dispatch<React.SetStateAction<string>>;
     setBannerImageUrl: React.Dispatch<React.SetStateAction<string>>;
-    setChangeUsername: React.Dispatch<React.SetStateAction<string>>;
 }
-const ProfileHeader = ({ userInfo, setProfileImageUrl, setBannerImageUrl, setChangeUsername }: MyComponentProps) => {
+const ProfileHeader = ({ userInfo, setUserInfo, setProfileImageUrl, setBannerImageUrl }: MyComponentProps) => {
     const editRef = useRef<HTMLDivElement>(null)
+    const route = useRouter()
+    const { data: session } = useSession();
+    const [logoutUser] = useLogoutUserMutation()
     // click dots
     const clickDots = () => {
         editRef.current?.classList.toggle("hidden");
+    }
+    const logOutFunction = async () => {
+        if (session) {
+            await nextAuthSignOut();
+        } else {
+            try {
+                const response = await logoutUser({}).unwrap()
+                setUserInfo(null)
+                toast.success(response.message)
+            } catch (error) {
+                const err = error as FetchBaseQueryError;
+                console.log("Failed: ", err);
+
+                if ("data" in err && err.data) {
+                    const serverData = err.data as ErrorResponseData;
+                    toast.error(serverData.message || serverData.error || "Something went wrong");
+                } else {
+                    toast.error("Network or unexpected error");
+                }
+            }
+        }
+        route.push('/');
     }
 
     return (
@@ -62,13 +94,16 @@ const ProfileHeader = ({ userInfo, setProfileImageUrl, setBannerImageUrl, setCha
                             <p onClick={() => {
                                 const dialog = document.getElementById("my_modal_change_username") as HTMLDialogElement | null;
                                 dialog?.showModal();
-                                setChangeUsername(userInfo?.username ? userInfo?.username : '')
                             }}
                                 className='flex items-center gap-2 p-1 rounded cursor-pointer hover:bg-blue-400/20'>
                                 <span className=''><FaUserEdit /></span>
                                 <span>Profile Edit</span>
                             </p>
-                            <p className='flex items-center gap-2 p-1 rounded cursor-pointer hover:bg-blue-400/20'>
+                            <p onClick={() => {
+                                const dialog = document.getElementById("my_modal_change_password") as HTMLDialogElement | null;
+                                dialog?.showModal();
+                            }}
+                                className='flex items-center gap-2 p-1 rounded cursor-pointer hover:bg-blue-400/20'>
                                 <span className=''><TbLockPassword /></span>
                                 <span>Change Password</span>
                             </p>
@@ -86,6 +121,11 @@ const ProfileHeader = ({ userInfo, setProfileImageUrl, setBannerImageUrl, setCha
                             <span>Profile</span>
                         </p>
                     </Link>
+                    <p onClick={() => logOutFunction()}
+                    className='flex items-center gap-2 py-1 px-2 rounded cursor-pointer hover:bg-blue-400/20'>
+                        <span className='text-red-500'><IoLogOutOutline /></span>
+                        <span>Log Out</span>
+                    </p>
                 </div>
             </div>
         </div>

@@ -25,16 +25,6 @@ export async function PUT(request: NextRequest) {
         // check old and new password
         if (newPassword === oldPassword) return NextResponse.json({ message: 'New password cannot be the same as the old password' }, { status: 400 });
 
-        // oldPassword check
-        const isPasswordCorrect = await bcryptjs.compare(oldPassword, user.password);
-
-        if (!isPasswordCorrect) {
-            return NextResponse.json(
-                { message: 'Old password is wrong' },
-                { status: 401 },
-            );
-        }
-
         // check newPassword
         function validatePassword(password: string): string | null {
             if (password.trim().length < 8 && password.trim().length > 0) return 'Password must be at least 8 characters long';
@@ -50,7 +40,17 @@ export async function PUT(request: NextRequest) {
         if (error) return NextResponse.json({ message: error, success: false }, { status: 400 });
 
         // check new and confirm password
-        if (newPassword !== confirmPassword) return NextResponse.json({ message: 'New password and confirm password do not match' }, { status: 400 });
+        if (newPassword !== confirmPassword) return NextResponse.json({ message: 'New password and confirm password do not match' }, { status: 401 });
+
+        // oldPassword check
+        const isPasswordCorrect = await bcryptjs.compare(oldPassword, user.password);
+
+        if (!isPasswordCorrect) {
+            return NextResponse.json(
+                { message: 'Old password is wrong' },
+                { status: 401 },
+            );
+        }
 
         // hashed new password
         const salt = await bcryptjs.genSalt(10)

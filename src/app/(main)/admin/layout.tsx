@@ -8,7 +8,7 @@ export default function AdminLayout({
 }>) {
     return (
         <>
-            <Navbar />
+            {/* <Navbar /> */}
             <AdminSidebar />
             {children}
         </>

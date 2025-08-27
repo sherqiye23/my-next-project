@@ -1,26 +1,28 @@
 'use client'
 import { FaRegStar, FaStar } from "react-icons/fa";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import '../globals.css'
 import { useGetAllCategoryQuery } from "@/lib/slices/categorySlice";
 import { useMyContext } from "@/context/UserEmailContext";
 import { cloudinaryUrl } from "@/lib/urls";
-import { useRouter } from "next/navigation";
-import { useSession, signOut as nextAuthSignOut } from "next-auth/react";
-import axios, { AxiosError } from "axios";
 import toast from "react-hot-toast";
-import Link from "next/link";
 import ProfileHeader from "@/components/User/User Profile components/ProfileHeader";
 import { BannerAndProfileChangeModal } from "@/components/User/User Profile components/Profile Modals/BannerAndProfileChangeModal";
-import { ErrorResponseData } from "@/types/catchError.types";
 import ModalComponent from "@/components/Modal component";
 import CustomFormik from "@/components/Form components";
 import * as Yup from 'yup';
-import { useUpdateUsernameUserMutation } from "@/lib/slices/usersSlice";
+import { useUpdatePasswordUserMutation, useUpdateUsernameUserMutation } from "@/lib/slices/usersSlice";
 
-interface FakeCategory {
+interface FakeCategory { 
   name: string,
   color: string
+}
+
+type FormikObj<T extends Yup.AnyObject> = {
+  initialValues: { key: string, value: string | undefined }[],
+  fields: { placeholder: string, type: string, name: string, title: string }[]
+  validationSchema: Yup.ObjectSchema<T>,
+  onSubmit: (values: Yup.InferType<Yup.ObjectSchema<T>>) => Promise<void>;
 }
 
 const fakeCate: FakeCategory[] = [
@@ -60,49 +62,113 @@ const fakeCate: FakeCategory[] = [
 
 export default function Home() {
   const { userInfo, setUserInfo, isLoading } = useMyContext()
-  const { data: session } = useSession();
-  const route = useRouter()
   const [updateUsernameUser] = useUpdateUsernameUserMutation()
+  const [updatePasswordUser] = useUpdatePasswordUserMutation()
   const [loading, setLoading] = useState<boolean>(false)
   const [bannerImageUrl, setBannerImageUrl] = useState<string>("");
   const [profileImageUrl, setProfileImageUrl] = useState<string>("");
-  const [changeUsername, setChangeUsername] = useState<string>("");
-  console.log(changeUsername);
 
-  const initialValues = [
-    { key: 'username', value: userInfo?.username },
-  ]
-  const fields = [
-    {
-      placeholder: 'Enter username',
-      type: 'text',
-      name: 'username',
-      title: 'Username'
-    },
-  ]
+  // change username
   const validationSchema = Yup.object({
-    username: Yup.string().trim().required('Username is required').max(30, "max 30 characters")
+    username: Yup.string().trim().required("Username is required").max(30, "max 30 characters"),
   });
-  type FormValues = Yup.InferType<typeof validationSchema>;
-
-  const changeUsernameSubmit = async (values: FormValues) => {
-    if (values.username !== userInfo?.username) {
-      setLoading(true)
-      const response = await updateUsernameUser({
-        username: values.username,
-        userId: userInfo?._id
-      }).unwrap()
-      setUserInfo({
-        ...userInfo!,
-        username: response.username
-      });
-      toast.success(`Change your username`)
+  type UsernameValues = Yup.InferType<typeof validationSchema>;
+  const changeUsernameObj: FormikObj<UsernameValues> = {
+    initialValues: [
+      { key: 'username', value: userInfo?.username },
+    ],
+    fields: [
+      {
+        placeholder: 'Enter username',
+        type: 'text',
+        name: 'username',
+        title: 'Username'
+      },
+    ],
+    validationSchema,
+    onSubmit: async (values: Yup.InferType<typeof changeUsernameObj.validationSchema>) => {
+      if (values.username !== userInfo?.username) {
+        setLoading(true)
+        const response = await updateUsernameUser({
+          username: values.username,
+          userId: userInfo?._id
+        }).unwrap()
+        setUserInfo({
+          ...userInfo!,
+          username: response.username
+        });
+        toast.success(`Change your username`)
+      }
+      const dialog = document.getElementById('my_modal_change_username') as HTMLDialogElement | null;
+      dialog?.close();
     }
-    const dialog = document.getElementById('my_modal_change_username') as HTMLDialogElement | null;
-    dialog?.close();
-    setChangeUsername('')
   }
 
+  // change password
+  const validationSchemaPassword = Yup.object({
+    oldPassword: Yup.string().required("Old password is required").trim(),
+    newPassword: Yup.string().required("Password is required")
+      .trim()
+      .matches(/^\S*$/)
+      .matches(
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])/,
+        "Must contain at least one uppercase letter, one lowercase letter, one number, and one special character"
+      )
+      .min(8, "Password is too short - it must be at least 8 characters long"),
+    confirmPassword: Yup.string().required("Confirm password is required").trim(),
+  });
+  type PasswordValues = Yup.InferType<typeof validationSchemaPassword>;
+  const changePasswordObj: FormikObj<PasswordValues> = {
+    initialValues: [
+      { key: 'oldPassword', value: '' },
+      { key: 'newPassword', value: '' },
+      { key: 'confirmPassword', value: '' },
+    ],
+    fields: [
+      {
+        placeholder: 'Enter old password',
+        type: 'password',
+        name: 'oldPassword',
+        title: 'Old Password'
+      },
+      {
+        placeholder: 'Enter new password',
+        type: 'password',
+        name: 'newPassword',
+        title: 'New Password'
+      },
+      {
+        placeholder: 'Enter confirm password',
+        type: 'password',
+        name: 'confirmPassword',
+        title: 'Confirm Password'
+      },
+    ],
+    validationSchema: validationSchemaPassword,
+    onSubmit: async (values: Yup.InferType<typeof changePasswordObj.validationSchema>) => {
+      if (values.oldPassword === values.newPassword) {
+        toast.error('New password cannot be the same as the old password')
+      } else if (values.newPassword !== values.confirmPassword) {
+        toast.error('New password and confirm password do not match')
+      } else {
+        setLoading(true)
+        const response = await updatePasswordUser({
+          userId: userInfo?._id,
+          oldPassword: values.oldPassword,
+          newPassword: values.newPassword,
+          confirmPassword: values.confirmPassword,
+        }).unwrap()
+        toast.success(response.message)
+        const dialog = document.getElementById('my_modal_change_password') as HTMLDialogElement | null;
+        dialog?.close();
+        values.oldPassword = ''
+        values.newPassword = ''
+        values.confirmPassword = ''
+      }
+    }
+  }
+
+  // category
   const { data, isLoading: categoryLoading, isError, error } = useGetAllCategoryQuery()
   useEffect(() => {
     if (isError) {
@@ -114,36 +180,17 @@ export default function Home() {
     setActiveCategory(id);
   }
 
-  const logOutFunction = async () => {
-    if (session) {
-      await nextAuthSignOut();
-    } else {
-      try {
-        const response = await axios.post('/api/users/post/logout', {})
-        setUserInfo(null)
-        toast.success(response.data.message)
-      } catch (error) {
-        const err = error as AxiosError;
-        console.log('Logout failed: ', err);
-        const data = err.response?.data as ErrorResponseData;
-        const message = data?.message || data?.error || err.message;
-        toast.error(message || 'Something went wrong');
-      }
-    }
-    route.push('/');
-  }
-
   return (
     <div>
       {
         isLoading ? (
           <span className="loading loading-spinner text-[#FD6406] fixed top-[50%] left-[50%] "></span>
         ) : (
-          <div className="grid grid-cols-[1fr_4fr_1fr] gap-2">
-            <div>
+          <div className={`grid gap-2 ${!userInfo?.username ? 'grid-cols-[4fr_1fr]' : 'grid-cols-[1fr_4fr_1fr]'}`}>
+            <div className={`${!userInfo?.username ? 'hidden' : ''}`}>
               <ProfileHeader
+                setUserInfo={setUserInfo}
                 userInfo={userInfo}
-                setChangeUsername={setChangeUsername}
                 setBannerImageUrl={setBannerImageUrl}
                 setProfileImageUrl={setProfileImageUrl} />
               <BannerAndProfileChangeModal
@@ -174,21 +221,29 @@ export default function Home() {
                   setLoading={setLoading}
                   formName='Username'
                   buttonText='Change Username'
-                  initialValues={initialValues}
-                  fields={fields}
-                  validationSchema={validationSchema}
-                  onSubmitFunction={changeUsernameSubmit} />
-
+                  initialValues={changeUsernameObj.initialValues}
+                  fields={changeUsernameObj.fields}
+                  validationSchema={changeUsernameObj.validationSchema}
+                  onSubmitFunction={changeUsernameObj.onSubmit} />
+              </ModalComponent>
+              <ModalComponent
+                id="my_modal_change_password"
+                title="Change Password">
+                <CustomFormik
+                  loading={loading}
+                  setLoading={setLoading}
+                  formName='Change Password'
+                  buttonText='Change Password'
+                  initialValues={changePasswordObj.initialValues}
+                  fields={changePasswordObj.fields}
+                  validationSchema={changePasswordObj.validationSchema}
+                  onSubmitFunction={changePasswordObj.onSubmit} />
               </ModalComponent>
             </div>
             <div className="w-full flex flex-col gap-2 pb-5">
-              <div className="flex gap-2 items-center">
+              <div className="">
                 <input type="search" name="search" id="search" placeholder="Search todo list"
                   className="p-2 rounded-xl bg-[var(--component-bg)] outline-none border-2 border-[var(--component-bg)] border-solid focus:border-[#b1caff91]" />
-                <button className="px-3 w-[100px] py-1 rounded-xl bg-red-500 text-white cursor-pointer" onClick={() => logOutFunction()}>LogOut</button>
-                <Link href={'/profile'}>
-                  <button className="px-3 py-1 rounded-xl bg-blue-400 text-white cursor-pointer">Profile</button>
-                </Link>
               </div>
               {
                 fakeCate.map((category, i) => (

@@ -134,13 +134,13 @@ export const usersApi = createApi({
         }),
         updatePasswordUser: builder.mutation({
             query: ({ userId, oldPassword, newPassword, confirmPassword }) => ({
-                url: `updatepassword?userId=${userId}&oldPassword=${oldPassword}&newPassword=${newPassword}&confirmPassword=${confirmPassword}`,
+                url: `put/updatepassword?userId=${userId}&oldPassword=${oldPassword}&newPassword=${newPassword}&confirmPassword=${confirmPassword}`,
                 method: 'PUT'
             }),
         }),
         updateRoleUser: builder.mutation({
             query: ({ userId, role }) => ({
-                url: `updaterole?userId=${userId}&role=${role}`,
+                url: `put/updaterole?userId=${userId}&role=${role}`,
                 method: 'PUT'
             }),
         }),
