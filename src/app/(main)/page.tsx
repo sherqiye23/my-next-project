@@ -12,6 +12,7 @@ import ModalComponent from "@/components/Modal component";
 import CustomFormik from "@/components/Form components";
 import * as Yup from 'yup';
 import { useUpdatePasswordUserMutation, useUpdateUsernameUserMutation } from "@/lib/slices/usersSlice";
+import { Loader } from "@/components/Loader";
 
 interface FakeCategory { 
   name: string,
@@ -184,7 +185,7 @@ export default function Home() {
     <div>
       {
         isLoading ? (
-          <span className="loading loading-spinner text-[#FD6406] fixed top-[50%] left-[50%] "></span>
+          <Loader/>
         ) : (
           <div className={`grid gap-2 ${!userInfo?.username ? 'grid-cols-[4fr_1fr]' : 'grid-cols-[1fr_4fr_1fr]'}`}>
             <div className={`${!userInfo?.username ? 'hidden' : ''}`}>

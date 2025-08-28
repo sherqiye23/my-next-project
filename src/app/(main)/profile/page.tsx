@@ -10,6 +10,7 @@ import { GoPencil } from 'react-icons/go';
 import ScrollCategories from '@/components/User/Scroll Categories';
 import ModalComponent from '@/components/Modal component';
 import { ErrorResponseData } from '@/types/catchError.types';
+import { Loader } from '@/components/Loader';
 
 export interface FakeCategory {
   name: string,
@@ -212,11 +213,7 @@ const UserProfile = () => {
     <>
       {
         isLoading ? (
-          <div className="flex min-h-[89vh] mx-auto my-0 max-w-[1350px]">
-            <div className='absolute top-[50%] left-[50%]'>
-              <span className="loading loading-spinner text-warning"></span>
-            </div>
-          </div>
+          <Loader />
         ) : (
           <div className="flex flex-col min-h-[100vh] mx-auto my-0 max-w-[1350px]">
             {/* Main Content */}

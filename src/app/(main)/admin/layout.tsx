@@ -7,11 +7,10 @@ export default function AdminLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <>
-            {/* <Navbar /> */}
+        <div className="grid gap-2 grid-cols-[1fr_4fr]">
             <AdminSidebar />
             {children}
-        </>
+        </div>
     );
 }
 

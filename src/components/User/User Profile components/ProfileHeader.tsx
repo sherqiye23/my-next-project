@@ -4,7 +4,7 @@ import Link from 'next/link';
 import React, { useRef } from 'react'
 import { FaStar, FaUserEdit } from 'react-icons/fa';
 import { GoTasklist } from "react-icons/go";
-import { RiEdit2Line, RiImageEditLine } from 'react-icons/ri';
+import { RiAdminLine, RiEdit2Line, RiImageEditLine } from 'react-icons/ri';
 import { TbLockPassword } from 'react-icons/tb';
 import { useSession, signOut as nextAuthSignOut } from "next-auth/react";
 import toast from 'react-hot-toast';
@@ -121,8 +121,14 @@ const ProfileHeader = ({ userInfo, setUserInfo, setProfileImageUrl, setBannerIma
                             <span>Profile</span>
                         </p>
                     </Link>
+                    <Link href="/admin/dashboard">
+                        <p className='flex items-center gap-2 py-1 px-2 rounded cursor-pointer hover:bg-blue-400/20'>
+                            <span className='text-xl'><RiAdminLine /></span>
+                            <span>Admin page</span>
+                        </p>
+                    </Link>
                     <p onClick={() => logOutFunction()}
-                    className='flex items-center gap-2 py-1 px-2 rounded cursor-pointer hover:bg-blue-400/20'>
+                        className='flex items-center gap-2 py-1 px-2 rounded cursor-pointer hover:bg-blue-400/20'>
                         <span className='text-red-500'><IoLogOutOutline /></span>
                         <span>Log Out</span>
                     </p>

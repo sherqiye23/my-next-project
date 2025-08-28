@@ -1,19 +1,20 @@
+import { IUser } from "@/models/userModel";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
-export interface GetAll {
-    _id: number;
-    createdAt: string;
-    _v: number;
-    username: string,
-    email: string,
-    password: string,
-    isAdmin: boolean,
-    profileImg: string,
-    bannerImg: string,
-    favoritesId: string,
-    todoListIds: string[],
-    chatIds: string[],
-}
+// export interface GetAll {
+//     _id: number;
+//     createdAt: string;
+//     _v: number;
+//     username: string,
+//     email: string,
+//     password: string,
+//     isAdmin: boolean,
+//     profileImg: string,
+//     bannerImg: string,
+//     favoritesId: string,
+//     todoListIds: string[],
+//     chatIds: string[],
+// }
 
 interface LoginRequest {
     email: string;
@@ -38,7 +39,7 @@ export const usersApi = createApi({
     }),
     endpoints: (builder) => ({
         // get requests
-        getAllUsers: builder.query<GetAll[], void>({
+        getAllUsers: builder.query<IUser[], void>({
             query: () => "get/getall",
         }),
         getAllFavorites: builder.query({
@@ -48,7 +49,7 @@ export const usersApi = createApi({
             query: (username) => `get/getbyusername?username=${username}`,
         }),
         // post requests
-        addToFavorites: builder.mutation<GetAll, Partial<GetAll>>({
+        addToFavorites: builder.mutation<IUser, Partial<IUser>>({
             query: (newFavorites) => ({
                 url: 'post/addtofavorites',
                 method: 'POST',
