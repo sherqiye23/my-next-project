@@ -55,7 +55,7 @@ export default function AdminTableComponent<T>({
                     <tbody>
                         {
                             data?.length ? (
-                                data.map((item: any, index: number) => (
+                                data.map((item: T, index: number) => (
                                     <TableRow key={index} columns={columns} item={item} indexRow={index} />
                                 ))
                             ) : (

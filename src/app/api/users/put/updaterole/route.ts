@@ -41,10 +41,6 @@ export async function PUT(request: NextRequest) {
             return NextResponse.json({ message: "You are not admin" }, { status: 403 });
         }
 
-        if (!userId || !role) {
-            return NextResponse.json({ message: "userId and role required" }, { status: 400 });
-        }
-
         await User.findByIdAndUpdate(userId, { isAdmin: roleBool })
         return NextResponse.json(
             { message: `${changeRoleUser.username}'s role has been changed to ${roleBool ? 'admin' : 'user'}` },

@@ -77,7 +77,7 @@ export const BannerAndProfileChangeModal = ({ modalId, changeImageName, userInfo
             }
         } finally {
             setLoading(false)
-        }
+        }   
     };
     const deleteImageFunction = async () => {
         try {

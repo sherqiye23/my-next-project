@@ -1,6 +1,7 @@
 import { columType } from "@/types/admintable.types";
 import UserEditButton from "../Tables buttons/UserEditButton";
 import UserDeleteButton from "../Tables buttons/UserDeleteButton";
+import { IUser } from "@/models/userModel";
 
 type MyPropsType<T> = {
     column: columType<T>,
@@ -11,7 +12,7 @@ type MyPropsType<T> = {
 export default function TableCell<T,>({ column, item, index }: MyPropsType<T>) {
     if (column.type === "text") {
         return (
-            <td className="p-1 whitespace-nowrap">
+            <td className={`p-1 whitespace-nowrap`}>
                 {column.getValue(item)}
             </td>
         );
@@ -19,6 +20,15 @@ export default function TableCell<T,>({ column, item, index }: MyPropsType<T>) {
         return (
             <td className="p-1">
                 {index + 1}
+            </td>
+        );
+    } else if (column.type === "color") {
+        return (
+            <td className={`p-1 whitespace-nowrap font-bold`}
+                style={{
+                    color: (item as { color?: string })?.color || ''
+                }}>
+                {column.getValue(item)}
             </td>
         );
     } else if (column.type === "image") {
@@ -33,17 +43,23 @@ export default function TableCell<T,>({ column, item, index }: MyPropsType<T>) {
             </td>
         );
     } else if (column.type === "userEdit") {
-        return (
-            <td className="p-1">
-                <UserEditButton clickFunction={column.onClick} item={item} />
-            </td>
-        );
+        if ((item as IUser).username) {
+            return (
+                <td className="p-1">
+                    <UserEditButton user={item as IUser} />
+                </td>
+            );
+        }
+        return <td className="p-1">Invalid User</td>;
     } else if (column.type === "userDelete") {
-        return (
-            <td className="p-1">
-                <UserDeleteButton clickFunction={column.onClick} item={item} />
-            </td>
-        );
+        if ((item as IUser).username) {
+            return (
+                <td className="p-1">
+                    <UserDeleteButton user={item as IUser} />
+                </td>
+            );
+        }
+        return <td className="p-1">Invalid User</td>;
     } else {
         return <td className="p-1">Unknown Type</td>;
     }

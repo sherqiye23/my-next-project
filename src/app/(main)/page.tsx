@@ -14,7 +14,7 @@ import * as Yup from 'yup';
 import { useUpdatePasswordUserMutation, useUpdateUsernameUserMutation } from "@/lib/slices/usersSlice";
 import { Loader } from "@/components/Loader";
 
-interface FakeCategory { 
+interface FakeCategory {
   name: string,
   color: string
 }
@@ -176,8 +176,8 @@ export default function Home() {
       console.log(error);
     }
   })
-  const [activeCategory, setActiveCategory] = useState<number>(0)
-  const getTodoListsByCategory = (id: number) => {
+  const [activeCategory, setActiveCategory] = useState<string>('0')
+  const getTodoListsByCategory = (id: string) => {
     setActiveCategory(id);
   }
 
@@ -185,7 +185,7 @@ export default function Home() {
     <div>
       {
         isLoading ? (
-          <Loader/>
+          <Loader />
         ) : (
           <div className={`grid gap-2 ${!userInfo?.username ? 'grid-cols-[4fr_1fr]' : 'grid-cols-[1fr_4fr_1fr]'}`}>
             <div className={`${!userInfo?.username ? 'hidden' : ''}`}>
@@ -309,12 +309,12 @@ export default function Home() {
                     <div>...loading</div>
                   ) : (
                     <div>
-                      <div className={`p-2 rounded-xl cursor-pointer ${activeCategory == 0 ? `font-semibold` : ''}`}
+                      <div className={`p-2 rounded-xl cursor-pointer ${activeCategory == '0' ? `font-semibold` : ''}`}
                         style={{
-                          backgroundColor: activeCategory == 0 ? `#c084fc20` : '',
-                          color: activeCategory == 0 ? `#c084fc` : '',
+                          backgroundColor: activeCategory == '0' ? `#c084fc20` : '',
+                          color: activeCategory == '0' ? `#c084fc` : '',
                         }}
-                        onClick={() => getTodoListsByCategory(0)}>
+                        onClick={() => getTodoListsByCategory('0')}>
                         All
                       </div>
                       {
@@ -324,17 +324,17 @@ export default function Home() {
                               backgroundColor: activeCategory == category._id ? `${category.color}20` : '',
                               color: activeCategory == category._id ? `${category.color}` : '',
                             }}
-                            onClick={() => getTodoListsByCategory(category._id)} key={category._id}>
+                            onClick={() => getTodoListsByCategory(String(category._id))} key={String(category._id)}>
                             {category.name}
                           </div>
                         ))
                       }
-                      <div className={`p-2 rounded-xl cursor-pointer ${activeCategory == -1 ? `font-semibold` : ''}`}
+                      <div className={`p-2 rounded-xl cursor-pointer ${activeCategory == '-1' ? `font-semibold` : ''}`}
                         style={{
-                          backgroundColor: activeCategory == -1 ? `#87CEEB20` : '',
-                          color: activeCategory == -1 ? `#87CEEB` : '',
+                          backgroundColor: activeCategory == '-1' ? `#87CEEB20` : '',
+                          color: activeCategory == '-1' ? `#87CEEB` : '',
                         }}
-                        onClick={() => getTodoListsByCategory(-1)}>
+                        onClick={() => getTodoListsByCategory('-1')}>
                         Other
                       </div>
                     </div>

@@ -26,8 +26,8 @@ const UsersTableComponent = () => {
             { type: "text", getValue: (user: IUser) => user.username },
             { type: "text", getValue: (user: IUser) => user.email },
             { type: "text", getValue: (user: IUser) => user.isAdmin ? 'Admin' : 'User' },
-            { type: "userEdit", getValue: (user: IUser) => 'user', onClick: (user: IUser) => console.log(user) },
-            { type: "userDelete", getValue: (user: IUser) => 'user', onClick: (user: IUser) => console.log(user) },
+            { type: "userEdit", getValue: (user: IUser) => 'user' },
+            { type: "userDelete", getValue: (user: IUser) => 'user' },
         ],
     }
     // todoListIds: string[],

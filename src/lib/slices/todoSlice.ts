@@ -1,17 +1,5 @@
+import { ITodo } from "@/models/todoModel";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-
-export interface GetAll {
-    _id: number;
-    createdAt: Date;
-    _v: number;
-    description: string;
-    todoListId: string;
-    isCompleted: boolean;
-    reminderTime: string | null;
-    isCustomReminderTime: boolean;
-    customReminderTime: string | null;
-    isSoftDeleted: boolean
-}
 
 export const todoApi = createApi({
     reducerPath: "todoApi",
@@ -27,10 +15,10 @@ export const todoApi = createApi({
     }),
     endpoints: (builder) => ({
         // get requests
-        getAllTodo: builder.query<GetAll[], void>({
+        getAllTodo: builder.query<ITodo[], void>({
             query: () => "get/getall",
         }),
-        getAllTodoSoftDeleted: builder.query<GetAll[], void>({
+        getAllTodoSoftDeleted: builder.query<ITodo[], void>({
             query: () => "get/getallsoftdeleted",
         }),
         getByIdTodo: builder.query({

@@ -1,16 +1,5 @@
+import { ICategory } from "@/models/categoryModel";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-
-export interface GetAll {
-  _id: number;
-  name: string;
-  createdById: string;
-  isCustom: boolean;
-  isSoftDeleted: boolean;
-  todoListIds: string[];
-  color: string;
-  createdAt: Date;
-  _v: number;
-}
 
 export const categoryApi = createApi({
   reducerPath: "categoryApi",
@@ -26,10 +15,10 @@ export const categoryApi = createApi({
   }),
   endpoints: (builder) => ({
     // get requests
-    getAllCategory: builder.query<GetAll[], void>({
+    getAllCategory: builder.query<ICategory[], void>({
       query: () => "get/getall",
     }),
-    getAllCategorySoftDeleted: builder.query<GetAll[], void>({
+    getAllCategorySoftDeleted: builder.query<ICategory[], void>({
       query: () => "get/getallsoftdeleted",
     }),
     getByIdCategory: builder.query({

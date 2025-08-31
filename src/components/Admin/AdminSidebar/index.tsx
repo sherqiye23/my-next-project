@@ -36,10 +36,26 @@ const AdminSidebar = () => {
           </Link>
         </li>
         <li>
-          <Link href="/admin/tables/todolists">
+          <Link href="/admin/tables/remindertimes">
             <div className='flex justify-center sm:justify-start gap-1'>
               <span>⌛</span>
               <span className='hidden sm:block whitespace-nowrap'>Reminder Times</span>
+            </div>
+          </Link>
+        </li>
+        <li>
+          <Link href="/admin/tables/todos">
+            <div className='flex justify-center sm:justify-start gap-1'>
+              <span>📝</span>
+              <span className='hidden sm:block whitespace-nowrap'>Todos</span>
+            </div>
+          </Link>
+        </li>
+        <li>
+          <Link href="/admin/tables/todolists">
+            <div className='flex justify-center sm:justify-start gap-1'>
+              <span>📋</span>
+              <span className='hidden sm:block whitespace-nowrap'>Todo Lists</span>
             </div>
           </Link>
         </li>

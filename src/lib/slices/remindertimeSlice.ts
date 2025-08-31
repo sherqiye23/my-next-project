@@ -1,13 +1,5 @@
+import { IReminderTime } from "@/models/reminderTimeModel";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-
-export interface GetAll {
-    _id: number;
-    createdAt: Date;
-    _v: number;
-    title: string,
-    time: string,
-    isSoftDeleted: boolean,
-}
 
 export const remindertimeApi = createApi({
     reducerPath: "remindertimeApi",
@@ -23,10 +15,10 @@ export const remindertimeApi = createApi({
     }),
     endpoints: (builder) => ({
         // get requests
-        getAllRemindertime: builder.query<GetAll[], void>({
+        getAllRemindertime: builder.query<IReminderTime[], void>({
             query: () => "get/getall",
         }),
-        getAllRemindertimeSoftDeleted: builder.query<GetAll[], void>({
+        getAllRemindertimeSoftDeleted: builder.query<IReminderTime[], void>({
             query: () => "get/getallsoftdeleted",
         }),
         getByIdRemindertime: builder.query({

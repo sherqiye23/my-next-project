@@ -1,19 +1,5 @@
+import { ITodoList } from "@/models/todolistModel";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-
-export interface GetAll {
-    _id: number;
-    createdAt: Date;
-    _v: number;
-    title: string,
-    createdById: string,
-    categoryId: string,
-    todosArray: string[],
-    commentIdsArray: string[],
-    isReported: boolean,
-    isPrivate: boolean,
-    isSoftDeleted: boolean,
-    isCompleted: boolean,
-}
 
 export const todoListApi = createApi({
     reducerPath: "todoListApi",
@@ -29,10 +15,10 @@ export const todoListApi = createApi({
     }),
     endpoints: (builder) => ({
         // get requests
-        getAllTodoList: builder.query<GetAll[], void>({
+        getAllTodoList: builder.query<ITodoList[], void>({
             query: () => "get/getall",
         }),
-        getAllTodoListSoftDeleted: builder.query<GetAll[], void>({
+        getAllTodoListSoftDeleted: builder.query<ITodoList[], void>({
             query: () => "get/getallsoftdeleted",
         }),
         getByIdTodoList: builder.query({

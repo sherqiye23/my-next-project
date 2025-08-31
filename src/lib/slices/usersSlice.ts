@@ -1,21 +1,6 @@
 import { IUser } from "@/models/userModel";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
-// export interface GetAll {
-//     _id: number;
-//     createdAt: string;
-//     _v: number;
-//     username: string,
-//     email: string,
-//     password: string,
-//     isAdmin: boolean,
-//     profileImg: string,
-//     bannerImg: string,
-//     favoritesId: string,
-//     todoListIds: string[],
-//     chatIds: string[],
-// }
-
 interface LoginRequest {
     email: string;
     password: string;
@@ -37,10 +22,12 @@ export const usersApi = createApi({
             return headers;
         },
     }),
+    tagTypes: ['User'],
     endpoints: (builder) => ({
         // get requests
         getAllUsers: builder.query<IUser[], void>({
             query: () => "get/getall",
+            providesTags: ['User'],
         }),
         getAllFavorites: builder.query({
             query: (id) => `get/getallfavorites/${id}`,
@@ -111,6 +98,14 @@ export const usersApi = createApi({
             }),
         }),
         // put requests
+        updateUser: builder.mutation({
+            query: (updateUser) => ({
+                url: 'put/updateallinfo',
+                method: 'PUT',
+                body: updateUser,
+            }),
+            invalidatesTags: ['User'],
+        }),
         updateBannerUser: builder.mutation({
             query: (updateBanner) => ({
                 url: 'put/updatebannerimage',
@@ -158,7 +153,8 @@ export const usersApi = createApi({
             query: (id) => ({
                 url: `delete/deleteuser/${id}`,
                 method: 'DELETE',
-            })
+            }),
+            invalidatesTags: ['User'],
         }),
     }),
 });
@@ -166,6 +162,6 @@ export const usersApi = createApi({
 export const {
     useGetAllUsersQuery, useGetAllFavoritesQuery, useGetByUsernameQuery,
     useLoginUserMutation, useLogoutUserMutation, useSendOtpUserMutation, useVerifyOtpUserMutation, useAddToFavoritesMutation, useForgotPasswordSendOtpUserMutation, useForgotPasswordVerifyOtpUserMutation, useResetPasswordUserMutation,
-    useUpdateBannerUserMutation, useUpdatePasswordUserMutation, useUpdateProfileUserMutation, useUpdateRoleUserMutation, useUpdateUsernameUserMutation,
+    useUpdateBannerUserMutation, useUpdatePasswordUserMutation, useUpdateProfileUserMutation, useUpdateRoleUserMutation, useUpdateUsernameUserMutation, useUpdateUserMutation,
     useDeleteFromFavoriteUserMutation, useDeleteUserMutation
 } = usersApi;
