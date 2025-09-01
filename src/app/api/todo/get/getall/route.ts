@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 
 export async function GET() {
     try {
-        const todos = await Todo.find({ isSoftDeleted: false });
+        const todos = await Todo.find({ isSoftDeleted: false }).sort({ createdAt: -1 });
         return NextResponse.json(todos, { status: 200 });
     } catch (error: unknown) {
         if (error instanceof mongoose.Error.ValidationError) {

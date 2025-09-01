@@ -1,9 +1,8 @@
 import ModalComponent from '@/components/Modal component'
+import { RequestFunction } from '@/components/Request function/RequestFunction';
 import { useUpdateUserMutation } from '@/lib/slices/usersSlice';
 import { cloudinaryUrl } from '@/lib/urls';
 import { IUser } from '@/models/userModel'
-import { ErrorResponseData } from '@/types/catchError.types';
-import { FetchBaseQueryError } from '@reduxjs/toolkit/query';
 import { ErrorMessage, Field, Form, Formik } from 'formik';
 import React, { useRef, useState } from 'react'
 import toast from 'react-hot-toast';
@@ -39,31 +38,22 @@ const UserEditButton = ({ user }: MyPropsType) => {
         username: Yup.string().trim().required('Username is required').max(30, "max 30 characters"),
     });
     const onSubmit = async (values: EditInfo) => {
-        try {
-            setLoading(true)
-            const formData = new FormData()
-            formData.append("bannerImg", values.bannerImg);
-            formData.append("profileImg", values.profileImg);
-            formData.append("username", values.username);
-            formData.append("userId", values.userId);
-            formData.append("isAdmin", String(values.isAdmin));
-            const response = await updateUser(formData).unwrap()
-            toast.success(`Edit user`)
-            const dialog = document.getElementById(`my_modal_edit_user_${user._id}`) as HTMLDialogElement | null;
-            dialog?.close();
-        } catch (error) {
-            const err = error as FetchBaseQueryError;
-            console.log("Change failed: ", err);
-
-            if ("data" in err && err.data) {
-                const serverData = err.data as ErrorResponseData;
-                toast.error(serverData.message || serverData.error || "Something went wrong");
-            } else {
-                toast.error("Network or unexpected error");
-            }
-        } finally {
-            setLoading(false)
-        }
+        setLoading(true)
+        await RequestFunction({
+            myFunction: async () => {
+                const formData = new FormData()
+                formData.append("bannerImg", values.bannerImg);
+                formData.append("profileImg", values.profileImg);
+                formData.append("username", values.username);
+                formData.append("userId", values.userId);
+                formData.append("isAdmin", String(values.isAdmin));
+                const response = await updateUser(formData).unwrap()
+                toast.success(`Edit user`)
+                const dialog = document.getElementById(`my_modal_edit_user_${user._id}`) as HTMLDialogElement | null;
+                dialog?.close();
+            },
+        });
+        setLoading(false);
     };
 
     return (

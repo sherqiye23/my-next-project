@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 
 export async function GET() {
     try {
-        const categories = await Category.find({ isSoftDeleted: true });
+        const categories = (await Category.find({ isSoftDeleted: true })).reverse();
         return NextResponse.json(categories, { status: 200 });
     } catch (error: unknown) {
         if (error instanceof mongoose.Error.ValidationError) {

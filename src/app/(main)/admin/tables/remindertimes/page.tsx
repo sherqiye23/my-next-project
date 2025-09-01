@@ -6,6 +6,6 @@ const ReminderTimesTableComponent = dynamic(
     { ssr: false }
 );
 
-export default function UsersTable() {
+export default function ReminderTimesTable() {
     return <ReminderTimesTableComponent />
 }

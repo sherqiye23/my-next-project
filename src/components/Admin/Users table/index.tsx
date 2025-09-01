@@ -17,7 +17,7 @@ const UsersTableComponent = () => {
         columns: columType<IUser>[];
     } = {
         tableName: 'Users',
-        rows: ['# / ', 'Profile / ', 'Banner / ', 'Username / ', 'Email / ', 'Role / ', 'Edit / ', 'Delete'],
+        rows: ['# / ', 'Profile / ', 'Banner / ', 'Username / ', 'Email / ', 'Role / ', 'See TodoLists / ', 'Edit / ', 'Delete'],
         data: usersData || [],
         columns: [
             { type: "id", getValue: (user: IUser) => String(user._id) },
@@ -26,11 +26,11 @@ const UsersTableComponent = () => {
             { type: "text", getValue: (user: IUser) => user.username },
             { type: "text", getValue: (user: IUser) => user.email },
             { type: "text", getValue: (user: IUser) => user.isAdmin ? 'Admin' : 'User' },
+            { type: "userSeeTodoLists", getValue: (user: IUser) => 'user' },
             { type: "userEdit", getValue: (user: IUser) => 'user' },
             { type: "userDelete", getValue: (user: IUser) => 'user' },
         ],
     }
-    // todoListIds: string[],
     return (
         isLoading ? (<Loader />) : (
             <AdminTableComponent<IUser>

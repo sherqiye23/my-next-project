@@ -1,5 +1,7 @@
 import { columType } from "@/types/admintable.types";
 import TableRow from "./TableRow";
+import { CiCirclePlus } from "react-icons/ci";
+import { LuArchiveRestore } from "react-icons/lu";
 
 type MyPropsType<T> = {
     tableName: string;
@@ -7,7 +9,8 @@ type MyPropsType<T> = {
     columns: columType<T>[];
     changeTable: string;
     setChangeTable: React.Dispatch<React.SetStateAction<string>>;
-    data: T[] | undefined
+    data: T[] | undefined,
+    buttonFunction?: () => void;
 }
 export default function AdminTableComponent<T>({
     tableName,
@@ -15,7 +18,8 @@ export default function AdminTableComponent<T>({
     changeTable,
     rows,
     data,
-    columns
+    columns,
+    buttonFunction
 }: MyPropsType<T>) {
     return (
         <div className="items-center flex flex-col rounded w-full overflow-auto">
@@ -24,22 +28,32 @@ export default function AdminTableComponent<T>({
                     {
                         changeTable === 'table' && rows?.includes('Soft Delete / ') ? (
                             <span onClick={() => setChangeTable('soft-delete-table')}
-                                className="text-lg whitespace-nowrap hover:bg-orange-700 rounded transition-all duration-250 ease-in cursor-pointer px-2">Soft Deleted Table</span>
+                                className="text-lg whitespace-nowrap hover:bg-orange-700 rounded transition-all duration-250 ease-in cursor-pointer px-2">
+                                Soft Deleted Table
+                            </span>
                         ) : (
                             <span onClick={() => setChangeTable('table')}
-                                className="text-lg whitespace-nowrap hover:bg-orange-700 rounded transition-all duration-250 ease-in cursor-pointer px-2">{tableName} Table</span>
+                                className="text-lg whitespace-nowrap hover:bg-orange-700 rounded transition-all duration-250 ease-in cursor-pointer px-2">
+                                {tableName} Table
+                            </span>
                         )
                     }
                 </div>
-                {
-                    changeTable === 'table' && tableName !== 'Users' ? (
-                        <div>Create button</div>
-                        // <CreateButton createButtonFunction={buttonFunction} />
-                    ) : changeTable === 'soft-delete-table' ? (
-                        <div>RestoreAll button</div>
-                        // <RestoreAllButton handleRestoreAll={buttonFunction} />
-                    ) : null
-                }
+                {changeTable === "table" && buttonFunction ? (
+                    <span
+                        onClick={buttonFunction}
+                        className="text-xl font-bold whitespace-nowrap hover:bg-orange-700 rounded-full transition-all duration-250 ease-in cursor-pointer p-1"
+                    >
+                        <CiCirclePlus />
+                    </span>
+                ) : changeTable === "soft-delete-table" ? (
+                    <span
+                        onClick={buttonFunction}
+                        className="text-xl font-bold whitespace-nowrap hover:bg-orange-700 rounded-full transition-all duration-250 ease-in cursor-pointer p-1"
+                    >
+                        <LuArchiveRestore />
+                    </span>
+                ) : null}
             </div>
             <div className="pt-[10px] w-full px-4 rounded-4 bg-[var(--component-bg)] overflow-x-auto">
                 <table className="w-full bg-[var(--component-bg)] min-w-max">

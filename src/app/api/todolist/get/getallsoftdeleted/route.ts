@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 
 export async function GET() {
     try {
-        const todolists = await TodoList.find({ isSoftDeleted: true });
+        const todolists = (await TodoList.find({ isSoftDeleted: true })).reverse();
         return NextResponse.json(todolists, { status: 200 });
     } catch (error: unknown) {
         if (error instanceof mongoose.Error.ValidationError) {

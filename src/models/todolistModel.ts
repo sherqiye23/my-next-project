@@ -1,6 +1,7 @@
 import mongoose, { Document, Types } from "mongoose";
 
 export interface ITodoList extends Document {
+    _id: Types.ObjectId | string,
     title: string,
     createdById: Types.ObjectId,
     categoryId: Types.ObjectId,
@@ -10,6 +11,7 @@ export interface ITodoList extends Document {
     isPrivate: boolean,
     isSoftDeleted: boolean,
     isCompleted: boolean,
+    createdAt: Date
 }
 
 const todolistSchema = new mongoose.Schema<ITodoList>(

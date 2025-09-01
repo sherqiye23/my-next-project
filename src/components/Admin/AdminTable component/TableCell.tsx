@@ -2,6 +2,13 @@ import { columType } from "@/types/admintable.types";
 import UserEditButton from "../Tables buttons/UserEditButton";
 import UserDeleteButton from "../Tables buttons/UserDeleteButton";
 import { IUser } from "@/models/userModel";
+import UserSeeTodoListsButton from "../Tables buttons/UserSeeTodoListsButton";
+import { ITodoList } from "@/models/todolistModel";
+import TodoListEditButton from "../Tables buttons/TodoListEditButton";
+import TodoListSeeTodosButton from "../Tables buttons/TodoListSeeTodosButton";
+import TodoListDeleteButton from "../Tables buttons/TodoListDeleteButton";
+import TodoListSoftDeleteButton from "../Tables buttons/TodoListSoftDeleteButton";
+import TodoListRestoreButton from "../Tables buttons/TodoListRestoreButton";
 
 type MyPropsType<T> = {
     column: columType<T>,
@@ -41,8 +48,10 @@ export default function TableCell<T,>({ column, item, index }: MyPropsType<T>) {
                     height="70px"
                 />
             </td>
-        );
-    } else if (column.type === "userEdit") {
+        )
+    }
+    // USER BUTTONS
+    else if (column.type === "userEdit") {
         if ((item as IUser).username) {
             return (
                 <td className="p-1">
@@ -60,7 +69,65 @@ export default function TableCell<T,>({ column, item, index }: MyPropsType<T>) {
             );
         }
         return <td className="p-1">Invalid User</td>;
-    } else {
+    } else if (column.type === "userSeeTodoLists") {
+        if ((item as IUser).username) {
+            return (
+                <td className="p-1">
+                    <UserSeeTodoListsButton user={item as IUser} />
+                </td>
+            );
+        }
+        return <td className="p-1">Invalid User</td>;
+    }
+    // TODOLIST BUTTONS
+    else if (column.type === "todoListEdit") {
+        if ((item as ITodoList).title) {
+            return (
+                <td className="p-1">
+                    <TodoListEditButton todolist={item as ITodoList} />
+                </td>
+            );
+        }
+        return <td className="p-1">Invalid Todo List</td>;
+    } else if (column.type === "todoListDelete") {
+        if ((item as ITodoList).title) {
+            return (
+                <td className="p-1">
+                    <TodoListDeleteButton todolist={item as ITodoList} />
+                </td>
+            );
+        }
+        return <td className="p-1">Invalid Todo List</td>;
+    } else if (column.type === "todoListSoftDelete") {
+        if ((item as ITodoList).title) {
+            return (
+                <td className="p-1">
+                    <TodoListSoftDeleteButton todolist={item as ITodoList} />
+                </td>
+            );
+        }
+        return <td className="p-1">Invalid Todo List</td>;
+    } else if (column.type === "todoListSeeTodos") {
+        if ((item as ITodoList).title) {
+            return (
+                <td className="p-1">
+                    <TodoListSeeTodosButton todolist={item as ITodoList} />
+                </td>
+            );
+        }
+        return <td className="p-1">Invalid Todo List</td>;
+    } else if (column.type === "todoListRestore") {
+        if ((item as ITodoList).title) {
+            return (
+                <td className="p-1">
+                    <TodoListRestoreButton todolist={item as ITodoList} />
+                </td>
+            );
+        }
+        return <td className="p-1">Invalid Todo List</td>;
+    }
+    // //////////////////////////
+    else {
         return <td className="p-1">Unknown Type</td>;
     }
 };

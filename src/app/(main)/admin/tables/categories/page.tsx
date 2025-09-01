@@ -6,6 +6,6 @@ const CategoriesTableComponent = dynamic(
     { ssr: false }
 );
 
-export default function UsersTable() {
+export default function CategoriesTable() {
     return <CategoriesTableComponent />
 }

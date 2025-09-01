@@ -13,16 +13,23 @@ export const todoListApi = createApi({
             return headers;
         },
     }),
+    tagTypes: ['TodoList'],
     endpoints: (builder) => ({
         // get requests
         getAllTodoList: builder.query<ITodoList[], void>({
             query: () => "get/getall",
+            providesTags: ['TodoList'],
         }),
         getAllTodoListSoftDeleted: builder.query<ITodoList[], void>({
             query: () => "get/getallsoftdeleted",
+            providesTags: ['TodoList'],
         }),
         getByIdTodoList: builder.query({
             query: (id) => `get/getbyid/${id}`,
+        }),
+        getUsersTodoList: builder.query({
+            query: (username) => `get/getuserstodolists/${username}`,
+            providesTags: ['TodoList'],
         }),
         // post requests
         postTodoList: builder.mutation({
@@ -32,6 +39,7 @@ export const todoListApi = createApi({
                 body: newTodoList,
                 headers: { 'Content-Type': 'application/json' }
             }),
+            invalidatesTags: ['TodoList'],
         }),
         // put requests
         updateTodoList: builder.mutation({
@@ -41,37 +49,42 @@ export const todoListApi = createApi({
                 body: updateTodoList,
                 headers: { 'Content-Type': 'application/json' }
             }),
+            invalidatesTags: ['TodoList'],
         }),
         restoreAllTodoList: builder.mutation({
             query: () => ({
                 url: 'put/restoreAll',
                 method: 'PUT',
             }),
+            invalidatesTags: ['TodoList'],
         }),
         restoreByIdTodoList: builder.mutation({
             query: (id) => ({
                 url: `put/restoreById/${id}`,
                 method: 'PUT',
             }),
+            invalidatesTags: ['TodoList'],
         }),
         // delete requests
         deleteTodoList: builder.mutation({
             query: (id) => ({
                 url: `delete/${id}`,
                 method: 'DELETE',
-            })
+            }),
+            invalidatesTags: ['TodoList'],
         }),
         softDeleteTodoList: builder.mutation({
             query: (id) => ({
                 url: `softdelete/${id}`,
                 method: 'DELETE',
-            })
+            }),
+            invalidatesTags: ['TodoList'],
         }),
     }),
 });
 
 export const {
-    useGetAllTodoListQuery, useGetAllTodoListSoftDeletedQuery, useGetByIdTodoListQuery,
+    useGetAllTodoListQuery, useGetAllTodoListSoftDeletedQuery, useGetByIdTodoListQuery, useGetUsersTodoListQuery,
     usePostTodoListMutation,
     useUpdateTodoListMutation, useRestoreAllTodoListMutation, useRestoreByIdTodoListMutation,
     useDeleteTodoListMutation, useSoftDeleteTodoListMutation

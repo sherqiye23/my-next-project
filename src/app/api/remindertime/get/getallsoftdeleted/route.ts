@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 
 export async function GET() {
     try {
-        const reminderTimes = await ReminderTime.find({ isSoftDeleted: true });
+        const reminderTimes = (await ReminderTime.find({ isSoftDeleted: true })).reverse();
         return NextResponse.json(reminderTimes, { status: 200 });
     } catch (error: unknown) {
         if (error instanceof mongoose.Error.ValidationError) {

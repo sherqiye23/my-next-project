@@ -6,6 +6,6 @@ const TodoListsTableComponent = dynamic(
     { ssr: false }
 );
 
-export default function UsersTable() {
+export default function TodoListsTable() {
     return <TodoListsTableComponent />
 }

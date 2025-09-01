@@ -9,7 +9,7 @@ import toast from "react-hot-toast";
 import ProfileHeader from "@/components/User/User Profile components/ProfileHeader";
 import { BannerAndProfileChangeModal } from "@/components/User/User Profile components/Profile Modals/BannerAndProfileChangeModal";
 import ModalComponent from "@/components/Modal component";
-import CustomFormik from "@/components/Form components";
+import CustomFormik, { FormikObj } from "@/components/Form components";
 import * as Yup from 'yup';
 import { useUpdatePasswordUserMutation, useUpdateUsernameUserMutation } from "@/lib/slices/usersSlice";
 import { Loader } from "@/components/Loader";
@@ -17,13 +17,6 @@ import { Loader } from "@/components/Loader";
 interface FakeCategory {
   name: string,
   color: string
-}
-
-type FormikObj<T extends Yup.AnyObject> = {
-  initialValues: { key: string, value: string | undefined }[],
-  fields: { placeholder: string, type: string, name: string, title: string }[]
-  validationSchema: Yup.ObjectSchema<T>,
-  onSubmit: (values: Yup.InferType<Yup.ObjectSchema<T>>) => Promise<void>;
 }
 
 const fakeCate: FakeCategory[] = [
