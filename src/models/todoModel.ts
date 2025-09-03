@@ -4,7 +4,7 @@ export interface ITodo extends Document {
     description: string;
     todoListId: Types.ObjectId;
     isCompleted: boolean;
-    reminderTime: Types.ObjectId | null;
+    reminderTime: string | null;
     isCustomReminderTime: boolean;
     customReminderTime: Date | null;
     isSoftDeleted: boolean

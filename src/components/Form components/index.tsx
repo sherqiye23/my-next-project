@@ -4,9 +4,10 @@ import { LuEye, LuEyeClosed } from "react-icons/lu";
 import * as Yup from 'yup';
 import { RequestFunction } from "../Request function/RequestFunction";
 import { useGetAllCategoryQuery } from "@/lib/slices/categorySlice";
+import SelectDate from "./SelectDate";
 
 export type FormikObj<T extends Yup.AnyObject> = {
-    initialValues: { key: string, value: string | boolean | undefined }[],
+    initialValues: { key: string, value: string | boolean | Date | null | undefined }[],
     fields: { placeholder: string, type: string, name: string, title: string }[]
     validationSchema: Yup.ObjectSchema<T>,
     onSubmit: (values: Yup.InferType<Yup.ObjectSchema<T>>) => Promise<void>;
@@ -14,7 +15,7 @@ export type FormikObj<T extends Yup.AnyObject> = {
 
 type initialType = {
     key: string;
-    value: string | boolean | undefined;
+    value: string | boolean | Date | null | undefined;
 }
 type fieldsType = {
     placeholder: string;
@@ -50,7 +51,7 @@ export default function CustomFormik<T extends Yup.AnyObject>({ loading, setLoad
                 });
             }}
         >
-            {({ setFieldValue }) => (
+            {({ values, setFieldValue }) => (
                 <Form>
                     <fieldset className="w-full fieldset bg-base-200 border p-4 border-base-300 rounded-box">
                         <legend className="fieldset-legend">{loading ? 'Processing' : formName}</legend>
@@ -88,30 +89,51 @@ export default function CustomFormik<T extends Yup.AnyObject>({ loading, setLoad
                                                         {field.title}
                                                     </label>
                                                 </div>
-                                            ) : (
-                                                <div className='flex flex-col gap-1'>
-                                                    <label htmlFor={field.name} className="label">{field.title}</label>
-                                                    <div className="relative">
-                                                        <Field
-                                                            type={isPasswordField ? (show ? "text" : "password") : field.type}
-                                                            id={field.name}
-                                                            name={field.name}
-                                                            className="input w-full pr-10"
-                                                            placeholder={field.placeholder}
-                                                        />
-
-                                                        {isPasswordField && (
-                                                            <div
-                                                                className="text-base absolute z-10 right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-500"
-                                                                onClick={() => setShow(!show)}
-                                                            >
-                                                                {show ? <LuEye /> : <LuEyeClosed />}
-                                                            </div>
+                                            ) :
+                                                field.type == 'date' ? (
+                                                    <div className='mb-2 w-full'>
+                                                        <label htmlFor={field.name}>Select Date:</label>
+                                                        {field.name === 'customReminderTime' ? (
+                                                            <SelectDate
+                                                                name={field.name}
+                                                                setFieldValue={setFieldValue}
+                                                                value={values[field.name] ? new Date(values[field.name]) : undefined}
+                                                            />
+                                                        ) : (
+                                                            <input
+                                                                type="text"
+                                                                id={field.name}
+                                                                name={field.name}
+                                                                value={values[field.name] || ""}
+                                                                disabled
+                                                                className="input w-full"
+                                                            />
                                                         )}
                                                     </div>
-                                                    <ErrorMessage name={field.name} component="div" className="text-red-600" />
-                                                </div>
-                                            )
+                                                ) : (
+                                                    <div className='flex flex-col gap-1'>
+                                                        <label htmlFor={field.name} className="label">{field.title}</label>
+                                                        <div className="relative">
+                                                            <Field
+                                                                type={isPasswordField ? (show ? "text" : "password") : field.type}
+                                                                id={field.name}
+                                                                name={field.name}
+                                                                className="input w-full pr-10"
+                                                                placeholder={field.placeholder}
+                                                            />
+
+                                                            {isPasswordField && (
+                                                                <div
+                                                                    className="text-base absolute z-10 right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-500"
+                                                                    onClick={() => setShow(!show)}
+                                                                >
+                                                                    {show ? <LuEye /> : <LuEyeClosed />}
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                        <ErrorMessage name={field.name} component="div" className="text-red-600" />
+                                                    </div>
+                                                )
                                     }
                                 </div>
                             );

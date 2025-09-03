@@ -1,14 +1,19 @@
 import { columType } from "@/types/admintable.types";
-import UserEditButton from "../Tables buttons/UserEditButton";
-import UserDeleteButton from "../Tables buttons/UserDeleteButton";
+import UserEditButton from "../Tables buttons/User/UserEditButton";
+import UserDeleteButton from "../Tables buttons/User/UserDeleteButton";
 import { IUser } from "@/models/userModel";
-import UserSeeTodoListsButton from "../Tables buttons/UserSeeTodoListsButton";
+import UserSeeTodoListsButton from "../Tables buttons/User/UserSeeTodoListsButton";
 import { ITodoList } from "@/models/todolistModel";
-import TodoListEditButton from "../Tables buttons/TodoListEditButton";
-import TodoListSeeTodosButton from "../Tables buttons/TodoListSeeTodosButton";
-import TodoListDeleteButton from "../Tables buttons/TodoListDeleteButton";
-import TodoListSoftDeleteButton from "../Tables buttons/TodoListSoftDeleteButton";
-import TodoListRestoreButton from "../Tables buttons/TodoListRestoreButton";
+import TodoListEditButton from "../Tables buttons/Todo List/TodoListEditButton";
+import TodoListSeeTodosButton from "../Tables buttons/Todo List/TodoListSeeTodosButton";
+import TodoListDeleteButton from "../Tables buttons/Todo List/TodoListDeleteButton";
+import TodoListSoftDeleteButton from "../Tables buttons/Todo List/TodoListSoftDeleteButton";
+import TodoListRestoreButton from "../Tables buttons/Todo List/TodoListRestoreButton";
+import { ITodo } from "@/models/todoModel";
+import TodoDeleteButton from "../Tables buttons/Todo/TodoDeleteButton";
+import TodoSoftDeleteButton from "../Tables buttons/Todo/TodoSoftDeleteButton";
+import TodoRestoreButton from "../Tables buttons/Todo/TodoRestoreButton";
+import TodoEditButton from "../Tables buttons/Todo/TodoEditButton";
 
 type MyPropsType<T> = {
     column: columType<T>,
@@ -126,7 +131,44 @@ export default function TableCell<T,>({ column, item, index }: MyPropsType<T>) {
         }
         return <td className="p-1">Invalid Todo List</td>;
     }
-    // //////////////////////////
+    // TODO BUTTONS
+    else if (column.type === "todoEdit") {
+        if ((item as ITodo).description) {
+            return (
+                <td className="p-1">
+                    <TodoEditButton todo={item as ITodo} />
+                </td>
+            );
+        }
+        return <td className="p-1">Invalid Todo</td>;
+    } else if (column.type === "todoDelete") {
+        if ((item as ITodo).description) {
+            return (
+                <td className="p-1">
+                    <TodoDeleteButton todo={item as ITodo} />
+                </td>
+            );
+        }
+        return <td className="p-1">Invalid Todo</td>;
+    } else if (column.type === "todoSoftDelete") {
+        if ((item as ITodo).description) {
+            return (
+                <td className="p-1">
+                    <TodoSoftDeleteButton todo={item as ITodo} />
+                </td>
+            );
+        }
+        return <td className="p-1">Invalid Todo</td>;
+    } else if (column.type === "todoRestore") {
+        if ((item as ITodo).description) {
+            return (
+                <td className="p-1">
+                    <TodoRestoreButton todo={item as ITodo} />
+                </td>
+            );
+        }
+        return <td className="p-1">Invalid Todo</td>;
+    }
     else {
         return <td className="p-1">Unknown Type</td>;
     }

@@ -1,5 +1,4 @@
 import ReminderTime from "@/models/reminderTimeModel";
-import TodoList from "@/models/todolistModel";
 import Todo from "@/models/todoModel";
 import mongoose from "mongoose";
 import { NextRequest, NextResponse } from "next/server";
@@ -7,8 +6,9 @@ import { NextRequest, NextResponse } from "next/server";
 export async function PUT(request: NextRequest) {
     try {
         const reqBody = await request.json()
-        const { todoId, description, reminderTime, customReminderTime } = reqBody
+        const { todoId, description, reminderTime, customReminderTime, isCompleted } = reqBody
         const isCustomReminderTime = customReminderTime ? true : false
+        // const isCompletedBool = isCompleted == 'true' ? true : false
 
         if (!description.trim()) {
             return NextResponse.json({
@@ -45,6 +45,7 @@ export async function PUT(request: NextRequest) {
             description: description.trim(),
             ...(reminderTime && { reminderTime }),
             ...(customReminderTime && { customReminderTime }),
+            isCompleted,
             isCustomReminderTime
         }, { new: true })
 

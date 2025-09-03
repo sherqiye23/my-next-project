@@ -3,7 +3,7 @@ import { useDeleteUserMutation } from '@/lib/slices/usersSlice'
 import { IUser } from '@/models/userModel'
 import React from 'react'
 import toast from 'react-hot-toast'
-import ModalDeleteAlert from '../Modal delete alert'
+import ModalDeleteAlert from '../../Modal delete alert'
 import { RequestFunction } from '@/components/Request function/RequestFunction'
 
 type MyPropsType = {

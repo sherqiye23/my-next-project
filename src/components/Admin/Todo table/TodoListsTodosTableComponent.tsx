@@ -3,10 +3,10 @@ import AdminTableComponent from '@/components/Admin/AdminTable component'
 import { Loader } from '@/components/Loader'
 import { useGetAllRemindertimeQuery } from '@/lib/slices/remindertimeSlice'
 import { useGetTodoListsTodosQuery } from '@/lib/slices/todoSlice'
-import { useGetAllUsersQuery } from '@/lib/slices/usersSlice'
 import { ITodo } from '@/models/todoModel'
 import { columType } from '@/types/admintable.types'
 import React, { useState } from 'react'
+import moment from 'moment'
 
 type MyPropsType = {
     todolistid: string
@@ -23,7 +23,7 @@ const TodoListsTodosTableComponent = ({ todolistid }: MyPropsType) => {
         columns: columType<ITodo>[];
     } = {
         tableName: 'Todo',
-        rows: ['# / ', 'Description / ', 'Reminder time / ', 'isCustomReminder / ', 'Edit / ', 'Soft Deleted / ', 'Delete'],
+        rows: ['# / ', 'Description / ', 'Reminder time / ', 'Is CustomReminder / ', 'Is Completed / ', 'Edit / ', 'Soft Deleted / ', 'Delete'],
         data: todoliststodosData || [],
         columns: [
             { type: "id", getValue: (item: ITodo) => String(item._id) },
@@ -32,7 +32,7 @@ const TodoListsTodosTableComponent = ({ todolistid }: MyPropsType) => {
                 type: "text",
                 getValue: (item: ITodo) =>
                     item.isCustomReminderTime
-                        ? String(item.customReminderTime ?? 'unknown')
+                        ? String(moment.utc(item.customReminderTime).local().format('DD MMM YYYY HH:mm') ?? 'unknown')
                         : String(
                             reminderTimeData?.find(
                                 (reminder) => String(reminder._id) === String(item.reminderTime)
@@ -40,6 +40,7 @@ const TodoListsTodosTableComponent = ({ todolistid }: MyPropsType) => {
                         )
             },
             { type: "text", getValue: (item: ITodo) => item.isCustomReminderTime ? 'Custom' : 'Not Custom' },
+            { type: "text", getValue: (item: ITodo) => item.isCompleted ? 'Completed' : 'Not Completed' },
             { type: "todoEdit", getValue: (item: ITodo) => 'item' },
             { type: "todoSoftDelete", getValue: (item: ITodo) => 'item' },
             { type: "todoDelete", getValue: (item: ITodo) => 'item' },
